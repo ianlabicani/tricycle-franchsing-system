@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('application_no')->unique();
+            $table->enum('franchise_type', ['new', 'renewal', 'amendment']);
+            $table->text('purpose')->nullable();
+            $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
+            $table->text('remarks')->nullable();
+            $table->dateTime('date_submitted')->nullable();
+            $table->dateTime('date_approved')->nullable();
             $table->timestamps();
         });
     }

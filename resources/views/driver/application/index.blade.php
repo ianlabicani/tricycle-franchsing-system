@@ -2,11 +2,65 @@
 
 @section('driver-content')
 
+    <!-- Breadcrumb -->
+    <nav class="mb-4">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{{ route('driver.dashboard') }}" class="hover:text-blue-600">Dashboard</a></li>
+            <li><i class="fas fa-chevron-right text-xs"></i></li>
+            <li class="text-gray-800 font-semibold">Applications</li>
+        </ol>
+    </nav>
+
     <!-- Page Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Franchise Application</h1>
-        <p class="text-gray-600 mt-2">Submit and track your franchise application</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Franchise Application</h1>
+                <p class="text-gray-600 mt-2">Submit and track your franchise application</p>
+            </div>
+            @if(empty($applications) || $applications->isEmpty())
+            <a href="{{ route('driver.application.create') }}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold shadow-lg">
+                <i class="fas fa-plus-circle mr-2"></i>New Application
+            </a>
+            @endif
+        </div>
     </div>
+
+    @if(isset($applications) && $applications->isEmpty())
+    <!-- No Applications State -->
+    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+        <div class="max-w-md mx-auto">
+            <div class="bg-blue-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-file-alt text-blue-600 text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">No Applications Yet</h2>
+            <p class="text-gray-600 mb-6">You haven't submitted any franchise applications. Ready to get started?</p>
+            <a href="{{ route('driver.application.create') }}" class="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold shadow-lg">
+                <i class="fas fa-plus-circle mr-2"></i>Create Your First Application
+            </a>
+            <div class="mt-8 pt-8 border-t">
+                <h3 class="font-bold text-gray-800 mb-3">Before You Start:</h3>
+                <div class="text-left space-y-2">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <span class="text-gray-700 text-sm">Ensure you have uploaded all required documents</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <span class="text-gray-700 text-sm">Have your vehicle information ready</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <span class="text-gray-700 text-sm">Choose your preferred route</span>
+                    </div>
+                </div>
+                <a href="{{ route('driver.requirements') }}" class="inline-block mt-4 text-blue-600 hover:text-blue-700 font-semibold text-sm">
+                    <i class="fas fa-arrow-right mr-1"></i>Upload Requirements First
+                </a>
+            </div>
+        </div>
+    </div>
+    @else
 
     <!-- Application Status Card -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-8 mb-8 text-white">
@@ -120,12 +174,21 @@
                 </div>
 
                 <div class="mt-6 pt-6 border-t flex space-x-3">
-                    <button class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-                        <i class="fas fa-edit mr-2"></i>Edit Application
-                    </button>
-                    <button class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold">
-                        <i class="fas fa-download mr-2"></i>Download PDF
-                    </button>
+                    @if(isset($applications) && $applications->isNotEmpty())
+                        <a href="{{ route('driver.application.show', $applications->first()->id) }}" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold text-center">
+                            <i class="fas fa-eye mr-2"></i>View Details
+                        </a>
+                        <a href="{{ route('driver.application.edit', $applications->first()->id) }}" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold text-center">
+                            <i class="fas fa-edit mr-2"></i>Edit Application
+                        </a>
+                    @else
+                        <button class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+                            <i class="fas fa-eye mr-2"></i>View Details
+                        </button>
+                        <button class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold">
+                            <i class="fas fa-edit mr-2"></i>Edit Application
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -260,7 +323,7 @@
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Need Assistance?</h2>
 
                 <div class="space-y-3">
-                    <a href="#" class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                    <a href="{{ route('driver.help') }}" class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
                         <i class="fas fa-headset text-blue-600 text-xl"></i>
                         <div>
                             <p class="font-semibold text-gray-800 text-sm">Contact Support</p>
@@ -268,7 +331,7 @@
                         </div>
                     </a>
 
-                    <a href="#" class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                    <a href="{{ route('driver.help') }}" class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
                         <i class="fas fa-book text-purple-600 text-xl"></i>
                         <div>
                             <p class="font-semibold text-gray-800 text-sm">Application Guide</p>
@@ -280,5 +343,7 @@
 
         </div>
     </div>
+
+    @endif
 
 @endsection

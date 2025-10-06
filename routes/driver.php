@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Driver\ApplicationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->group(function () {
@@ -19,9 +20,13 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
     })->name('inspection');
 
     // Application Management
-    Route::get('/application', function () {
-        return view('driver.application');
-    })->name('application');
+    Route::get('/application', [ApplicationController::class, 'index'])->name('application');
+    Route::get('/application/create', [ApplicationController::class, 'create'])->name('application.create');
+    Route::post('/application', [ApplicationController::class, 'store'])->name('application.store');
+    Route::get('/application/{application}', [ApplicationController::class, 'show'])->name('application.show');
+    Route::get('/application/{application}/edit', [ApplicationController::class, 'edit'])->name('application.edit');
+    Route::put('/application/{application}', [ApplicationController::class, 'update'])->name('application.update');
+    Route::delete('/application/{application}', [ApplicationController::class, 'destroy'])->name('application.destroy');
 
     // Payments
     Route::get('/payments', function () {
