@@ -21,7 +21,13 @@
                 </div>
                 <div class="flex space-x-3">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">Dashboard</a>
+                    @if (Auth::user()->hasRole('driver'))
+                        <a href="{{ route('driver.dashboard') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">Dashboard</a>
+                    @endif
+
+                    @if (Auth::user()->hasRole('sb_staff'))
+                        <a href="{{ route('sb.dashboard') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">Dashboard</a>
+                    @endif
                     @else
                         <a href="{{ route('login') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">Login</a>
                     @endauth

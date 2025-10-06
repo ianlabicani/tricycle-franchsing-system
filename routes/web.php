@@ -13,6 +13,9 @@ Route::get('/dashboard', function () {
     // Redirect based on user role
     if ($user->hasRole('driver')) {
         return redirect()->route('driver.dashboard');
+    } elseif ($user->hasRole('sb_staff')) {
+        return redirect()->route('sb.dashboard');
+
     } elseif ($user->hasRole('inspector')) {
         return redirect()->route('inspector.dashboard');
     } elseif ($user->hasRole('treasury')) {
@@ -31,3 +34,4 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 require __DIR__.'/driver.php';
+require __DIR__.'/sb.php';
