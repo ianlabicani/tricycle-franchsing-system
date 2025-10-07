@@ -312,27 +312,35 @@
         <div class="space-y-6">
 
             <!-- Quick Actions -->
-            @if(!in_array($application->status, ['approved', 'rejected', 'released', 'completed']))
+            @if($application->status === 'for_scheduling')
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Next Steps</h2>
+
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg mb-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <p class="text-sm text-green-800 font-semibold">Documents Reviewed</p>
+                            <p class="text-xs text-green-700 mt-1">Application is ready for inspection scheduling.</p>
+                            @if($application->latestSchedule)
+                            <p class="text-xs text-green-700 mt-1">Queue Number: <span class="font-bold">{{ $application->latestSchedule->queue_number }}</span></p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{{ route('sb.inspections.create', ['application_id' => $application->id]) }}" class="block w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold text-center">
+                    <i class="fas fa-calendar-check mr-2"></i>View Schedule Details
+                </a>
+            </div>
+            @elseif(!in_array($application->status, ['approved', 'rejected', 'released', 'completed']))
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Review Actions</h2>
 
                 <div class="space-y-3">
-                    <!-- Approve Button -->
-                    <form action="{{ route('sb.applications.approve', $application) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold">
-                            <i class="fas fa-check-circle mr-2"></i>Approve Application
-                        </button>
-                    </form>
-
                     <!-- Review Button (Mark Complete or Incomplete) -->
                     <button onclick="openReviewModal()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
                         <i class="fas fa-clipboard-check mr-2"></i>Review Documents
-                    </button>
-
-                    <!-- Reject Button -->
-                    <button onclick="openRejectModal()" class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition font-semibold">
-                        <i class="fas fa-times-circle mr-2"></i>Reject Application
                     </button>
                 </div>
             </div>

@@ -110,6 +110,22 @@ class Application extends Model
     }
 
     /**
+     * Get the schedules for the application.
+     */
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
+    /**
+     * Get the latest schedule for the application.
+     */
+    public function latestSchedule()
+    {
+        return $this->hasOne(Schedule::class)->latestOfMany();
+    }
+
+    /**
      * Check if application is renewable (expiring soon or expired).
      */
     public function isRenewable(): bool
