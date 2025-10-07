@@ -80,7 +80,7 @@ class ApplicationController extends Controller
         ]);
 
         // If documents are incomplete, mark as incomplete
-        // If complete, mark as ready for scheduling and create a schedule
+        // If complete, mark as ready for scheduling
         $status = $request->is_complete ? 'for_scheduling' : 'incomplete';
 
         $application->update([
@@ -90,22 +90,8 @@ class ApplicationController extends Controller
             'reviewed_by' => auth()->id(),
         ]);
 
-        // If marked as complete, automatically create a schedule
-        if ($request->is_complete) {
-            $scheduleDate = now()->addDay(); // Default to next day, can be modified
-
-            Schedule::create([
-                'application_id' => $application->id,
-                'scheduled_by' => auth()->id(),
-                'schedule_date' => $scheduleDate,
-                'queue_number' => Schedule::generateQueueNumber($scheduleDate),
-                'status' => 'scheduled',
-                'remarks' => 'Auto-generated schedule from application review',
-            ]);
-        }
-
         $message = $status === 'for_scheduling'
-            ? 'Application marked as complete and schedule created with queue number.'
+            ? 'Application marked as complete and ready for scheduling.'
             : 'Application marked as incomplete. Driver has been notified.';
 
         return redirect()->route('sb.applications.show', $application)

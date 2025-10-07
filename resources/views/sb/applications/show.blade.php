@@ -329,9 +329,15 @@
                     </div>
                 </div>
 
-                <a href="{{ route('sb.inspections.create', ['application_id' => $application->id]) }}" class="block w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold text-center">
+                @if($application->latestSchedule)
+                <a href="{{ route('sb.schedules.show', $application->latestSchedule) }}" class="block w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold text-center">
                     <i class="fas fa-calendar-check mr-2"></i>View Schedule Details
                 </a>
+                @else
+                <a href="{{ route('sb.schedules.create', ['application_id' => $application->id]) }}" class="block w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold text-center">
+                    <i class="fas fa-calendar-plus mr-2"></i>Create Schedule
+                </a>
+                @endif
             </div>
             @elseif(!in_array($application->status, ['approved', 'rejected', 'released', 'completed']))
             <div class="bg-white rounded-xl shadow-lg p-6">

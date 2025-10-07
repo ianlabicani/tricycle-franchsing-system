@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SB\ApplicationController;
 use App\Http\Controllers\SB\InspectionController;
+use App\Http\Controllers\SB\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(function () {
@@ -26,5 +27,14 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::put('/inspections/{inspection}', [InspectionController::class, 'update'])->name('inspections.update');
     Route::post('/inspections/{inspection}/complete', [InspectionController::class, 'complete'])->name('inspections.complete');
     Route::post('/inspections/{inspection}/cancel', [InspectionController::class, 'cancel'])->name('inspections.cancel');
+
+    // Schedule Management
+    Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
+    Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('schedules.create');
+    Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
+    Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show');
+    Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedules.edit');
+    Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
+    Route::post('/schedules/{schedule}/cancel', [ScheduleController::class, 'cancel'])->name('schedules.cancel');
 });
 

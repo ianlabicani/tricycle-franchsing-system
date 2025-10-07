@@ -28,6 +28,10 @@
                     <i class="fas fa-file-alt"></i>
                     <span>Applications</span>
                 </a>
+                <a href="{{ route('sb.schedules.index') }}" class="text-white hover:bg-purple-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('sb.schedules.*') ? 'bg-purple-500' : '' }}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Schedules</span>
+                </a>
                 <a href="{{ route('sb.inspections.index') }}" class="text-white hover:bg-purple-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('sb.inspections.*') ? 'bg-purple-500' : '' }}">
                     <i class="fas fa-clipboard-check"></i>
                     <span>Inspections</span>
