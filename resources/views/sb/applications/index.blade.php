@@ -138,7 +138,7 @@
                             </td>
                             <td class="px-4 py-4">
                                 <div class="flex items-center space-x-3">
-                                    <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar" class="h-8 w-8 rounded-full">
+                                    <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Avatar" class="h-8 w-8 rounded-full object-cover">
                                     <div>
                                         <p class="font-semibold text-gray-800">{{ $application->user->name }}</p>
                                         <p class="text-xs text-gray-500">{{ $application->user->email }}</p>

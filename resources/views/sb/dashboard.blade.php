@@ -83,7 +83,7 @@
                     <!-- Sample Pending Application -->
                     <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg hover:shadow-md transition">
                         <div class="flex items-center space-x-3">
-                            <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar" class="h-10 w-10 rounded-full">
+                            <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Avatar" class="h-10 w-10 rounded-full object-cover">
                             <div>
                                 <p class="font-semibold text-gray-800">Juan Dela Cruz</p>
                                 <p class="text-xs text-gray-500">New Franchise • Submitted 2 hours ago</p>
@@ -96,7 +96,7 @@
 
                     <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg hover:shadow-md transition">
                         <div class="flex items-center space-x-3">
-                            <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar" class="h-10 w-10 rounded-full">
+                            <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Avatar" class="h-10 w-10 rounded-full object-cover">
                             <div>
                                 <p class="font-semibold text-gray-800">Maria Santos</p>
                                 <p class="text-xs text-gray-500">Renewal • Submitted 5 hours ago</p>
@@ -109,7 +109,7 @@
 
                     <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg hover:shadow-md transition">
                         <div class="flex items-center space-x-3">
-                            <img src="{{ asset('images/default-avatar.png') }}" alt="Avatar" class="h-10 w-10 rounded-full">
+                            <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Avatar" class="h-10 w-10 rounded-full object-cover">
                             <div>
                                 <p class="font-semibold text-gray-800">Pedro Reyes</p>
                                 <p class="text-xs text-gray-500">Amendment • Submitted yesterday</p>

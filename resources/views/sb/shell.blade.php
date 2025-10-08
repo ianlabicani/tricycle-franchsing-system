@@ -10,9 +10,9 @@
             <!-- Left Side - Logo and Brand -->
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-3">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="h-10 w-10 rounded-full object-cover ring-2 ring-white">
+                    <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Municipality of Lal-lo Logo" class="h-10 w-10 object-cover rounded-full ring-2 ring-white">
                     <div class="hidden md:block">
-                        <h1 class="text-white font-bold text-lg">Tricycle Franchise</h1>
+                        <h1 class="text-white font-bold text-lg">CTRIKE - Lal-lo</h1>
                         <p class="text-purple-200 text-xs">SB Staff Portal</p>
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                             <p class="text-sm font-semibold">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-purple-200">SB Staff</p>
                         </div>
-                        <img src="{{ asset('images/default-avatar.png') }}" alt="User Avatar" class="h-10 w-10 rounded-full object-cover ring-2 ring-white">
+                        <img src="{{ asset('images/municipality-logo.jpg') }}" alt="User Avatar" class="h-10 w-10 rounded-full object-cover ring-2 ring-white">
                         <i class="fas fa-chevron-down text-sm"></i>
                     </button>
 

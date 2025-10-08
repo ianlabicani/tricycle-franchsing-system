@@ -10,8 +10,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="Tricycle Franchise Logo" class="h-12 w-12 rounded-full object-cover">
-                    <span class="text-xl font-bold text-gray-800">Tricycle Franchise System</span>
+                    <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Municipality of Lal-lo Logo" class="h-14 w-14 object-cover rounded-full">
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold text-gray-800">CTRIKE: Municipality of Lal-lo</span>
+                        <span class="text-xs text-gray-600">Tricycle Franchising Management System</span>
+                    </div>
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="#home" class="text-gray-700 hover:text-blue-600 font-medium transition">Home</a>
@@ -38,12 +41,16 @@
 
     <!-- Hero Section -->
     <section id="home" class="relative h-screen flex items-center justify-center text-white">
-        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('images/tricycle-bg.jpg') }}');">
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-900 to-blue-700 opacity-90"></div>
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('{{ asset('images/municipality-bg.jpg') }}');">
+            <div class="absolute inset-0 bg-gradient-to-r from-green-900 to-blue-900 opacity-85"></div>
         </div>
         <div class="relative z-10 text-center px-4">
-            <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">Tricycle Franchising Management System</h1>
-            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Streamline your tricycle franchise operations with our comprehensive management platform.</p>
+            <div class="flex justify-center mb-8">
+                <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Municipality of Lal-lo" class="h-32 w-32 object-cover rounded-full ring-4 ring-white drop-shadow-2xl">
+            </div>
+            <h1 class="text-5xl md:text-6xl font-bold mb-4 animate-fade-in">CTRIKE: Municipality of Lal-lo</h1>
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-green-200">Tricycle Franchising Management System</h2>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">Streamline your tricycle franchise operations with our comprehensive management platform for Lal-lo, Cagayan.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="#about" class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition transform hover:scale-105">Learn More</a>
                 <a href="#contact" class="bg-white text-gray-800 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105">Get Started</a>
@@ -59,23 +66,26 @@
                 <div class="w-24 h-1 bg-blue-600 mx-auto"></div>
             </div>
             <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <img src="{{ asset('images/tricycle-fleet.jpg') }}" alt="Tricycle Fleet" class="rounded-lg shadow-xl w-full h-96 object-cover">
+                <div class="relative">
+                    <img src="{{ asset('images/agency-logo.jpg') }}" alt="Tricycle Agency" class="rounded-lg shadow-xl w-full h-96 object-cover">
+                    <div class="absolute bottom-4 left-4 bg-white bg-opacity-90 px-4 py-2 rounded-lg">
+                        <p class="text-sm font-semibold text-gray-800">Municipality of Lal-lo, Cagayan</p>
+                    </div>
                 </div>
                 <div>
                     <h3 class="text-3xl font-bold text-gray-800 mb-6">Our Mission & Vision</h3>
                     <p class="text-gray-600 text-lg mb-4 leading-relaxed">
-                        Our Tricycle Franchising Management System is designed to streamline and modernize the operations of tricycle franchises. We provide a comprehensive platform that connects drivers, inspectors, treasury staff, and administrators in one unified system.
+                        The CTRIKE Tricycle Franchising Management System for the Municipality of Lal-lo is designed to streamline and modernize the operations of tricycle franchises in our community. We provide a comprehensive platform that connects drivers, inspectors, treasury staff, and administrators in one unified system.
                     </p>
                     <p class="text-gray-600 text-lg mb-6 leading-relaxed">
-                        Through digital transformation, we aim to improve efficiency, transparency, and accountability in tricycle franchise management.
+                        Through digital transformation, we aim to improve efficiency, transparency, and accountability in tricycle franchise management for the Municipality of Lal-lo.
                     </p>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h4 class="text-2xl font-bold text-blue-600 mb-2">100+</h4>
-                            <p class="text-gray-600">Active Drivers</p>
+                        <div class="bg-gradient-to-br from-green-50 to-white p-6 rounded-lg shadow-md border-l-4 border-green-600">
+                            <h4 class="text-2xl font-bold text-green-600 mb-2">500+</h4>
+                            <p class="text-gray-600">Registered Drivers</p>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="bg-gradient-to-br from-blue-50 to-white p-6 rounded-lg shadow-md border-l-4 border-blue-600">
                             <h4 class="text-2xl font-bold text-blue-600 mb-2">6</h4>
                             <p class="text-gray-600">User Roles</p>
                         </div>
@@ -274,14 +284,17 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12">
+    <footer class="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <!-- About Column -->
                 <div>
                     <div class="flex items-center space-x-3 mb-4">
-                        <img src="{{ asset('images/logo.jpg') }}" alt="Tricycle Franchise Logo" class="h-10 w-10 rounded-full object-cover">
-                        <h3 class="text-xl font-bold">Tricycle Franchise</h3>
+                        <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Municipality of Lal-lo Logo" class="h-12 w-12 object-cover rounded-full">
+                        <div>
+                            <h3 class="text-lg font-bold">CTRIKE</h3>
+                            <p class="text-xs text-gray-400">Municipality of Lal-lo</p>
+                        </div>
                     </div>
                     <p class="text-gray-400">Modernizing tricycle franchise management through digital innovation.</p>
                 </div>
@@ -326,7 +339,8 @@
             </div>
 
             <div class="border-t border-gray-700 pt-8 text-center text-gray-400">
-                <p>&copy; {{ date('Y') }} Tricycle Franchising Management System. All rights reserved. Built with innovation and efficiency.</p>
+                <p>&copy; {{ date('Y') }} CTRIKE - Municipality of Lal-lo Tricycle Franchising Management System. All rights reserved.</p>
+                <p class="text-sm mt-2">Built with innovation and efficiency for the people of Lal-lo, Cagayan</p>
             </div>
         </div>
     </footer>

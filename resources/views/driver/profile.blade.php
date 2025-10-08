@@ -15,7 +15,7 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <div class="text-center">
                     <div class="relative inline-block">
-                        <img src="{{ asset('images/default-avatar.png') }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover ring-4 ring-blue-500 mx-auto">
+                        <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover ring-4 ring-blue-500 mx-auto">
                         <button class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 hover:bg-blue-700 transition">
                             <i class="fas fa-camera"></i>
                         </button>
