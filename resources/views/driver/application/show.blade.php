@@ -236,103 +236,344 @@
                     <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-300"></div>
 
                     <div class="space-y-6">
-                        @php
-                            $statuses = [
-                                'draft' => ['icon' => 'fa-file-alt', 'title' => 'Draft Created', 'desc' => 'Application form created', 'date' => $application->created_at],
-                                'pending_review' => ['icon' => 'fa-paper-plane', 'title' => 'Application Submitted', 'desc' => 'Submitted for SB Staff review', 'date' => $application->date_submitted],
-                                'incomplete' => ['icon' => 'fa-exclamation-circle', 'title' => 'Incomplete Requirements', 'desc' => 'Additional documents required', 'date' => $application->reviewed_at, 'warning' => true],
-                                'for_scheduling' => ['icon' => 'fa-check-circle', 'title' => 'Review Completed', 'desc' => 'Ready for inspection scheduling', 'date' => $application->reviewed_at],
-                                'inspection_scheduled' => ['icon' => 'fa-calendar-check', 'title' => 'Inspection Scheduled', 'desc' => 'Inspection date and time set', 'date' => $application->scheduled_at],
-                                'inspection_pending' => ['icon' => 'fa-clipboard-check', 'title' => 'Awaiting Inspection', 'desc' => 'Vehicle inspection in progress', 'date' => $application->scheduled_at],
-                                'inspection_failed' => ['icon' => 'fa-times-circle', 'title' => 'Inspection Failed', 'desc' => 'Vehicle did not pass inspection', 'date' => $application->inspected_at, 'danger' => true],
-                                'for_treasury' => ['icon' => 'fa-money-bill-wave', 'title' => 'For Payment', 'desc' => 'Proceed to treasury for payment', 'date' => $application->inspected_at],
-                                'for_approval' => ['icon' => 'fa-hourglass-half', 'title' => 'For Final Approval', 'desc' => 'Payment verified, awaiting SB approval', 'date' => $application->payment_verified_at],
-                                'approved' => ['icon' => 'fa-check-double', 'title' => 'Application Approved', 'desc' => 'Approved by SB officials', 'date' => $application->date_approved],
-                                'rejected' => ['icon' => 'fa-ban', 'title' => 'Application Rejected', 'desc' => 'Application was not approved', 'date' => $application->rejected_at, 'danger' => true],
-                                'released' => ['icon' => 'fa-file-export', 'title' => 'Documents Released', 'desc' => 'Franchise documents ready for pickup', 'date' => $application->released_at],
-                                'completed' => ['icon' => 'fa-trophy', 'title' => 'Process Completed', 'desc' => 'All requirements fulfilled', 'date' => $application->completed_at],
-                                'for_renewal' => ['icon' => 'fa-redo', 'title' => 'For Renewal', 'desc' => 'Franchise due for renewal', 'date' => $application->expiration_date],
-                            ];
+                        <!-- 1. Application Submitted -->
+                        <div class="relative flex items-start space-x-4">
+                            <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                <h3 class="font-bold text-gray-800">Application Submitted</h3>
+                                <p class="text-sm text-gray-600 mt-1">Your application has been received and is under review</p>
+                                @if($application->date_submitted)
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        <i class="fas fa-clock mr-1"></i>
+                                        {{ $application->date_submitted->format('F d, Y - g:i A') }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
 
-                            $currentStatusIndex = array_search($application->status, array_keys($statuses));
-                            $statusIndex = 0;
-                        @endphp
-
-                        @foreach($statuses as $statusKey => $statusInfo)
-                            @php
-                                $thisStatusIndex = $statusIndex++;
-                                $isPassed = $thisStatusIndex < $currentStatusIndex || $statusKey === $application->status;
-                                $isCurrent = $statusKey === $application->status;
-                                $isFuture = $thisStatusIndex > $currentStatusIndex;
-
-                                // Skip certain statuses if not relevant
-                                if ($statusKey === 'incomplete' && $application->status !== 'incomplete' && !in_array('incomplete', [$application->status])) {
-                                    continue;
-                                }
-                                if ($statusKey === 'inspection_failed' && $application->status !== 'inspection_failed') {
-                                    continue;
-                                }
-                                if ($statusKey === 'rejected' && $application->status !== 'rejected') {
-                                    continue;
-                                }
-
-                                // Determine colors
-                                if (isset($statusInfo['danger'])) {
-                                    $bgColor = 'bg-red-500';
-                                    $cardBg = 'bg-red-50';
-                                    $textColor = 'text-gray-800';
-                                } elseif (isset($statusInfo['warning'])) {
-                                    $bgColor = 'bg-orange-500';
-                                    $cardBg = 'bg-orange-50';
-                                    $textColor = 'text-gray-800';
-                                } elseif ($isCurrent) {
-                                    $bgColor = 'bg-blue-500';
-                                    $cardBg = 'bg-blue-50';
-                                    $textColor = 'text-gray-800';
-                                } elseif ($isPassed) {
-                                    $bgColor = 'bg-green-500';
-                                    $cardBg = 'bg-green-50';
-                                    $textColor = 'text-gray-800';
-                                } else {
-                                    $bgColor = 'bg-gray-300';
-                                    $cardBg = 'bg-gray-50';
-                                    $textColor = 'text-gray-600';
-                                }
-                            @endphp
-
+                        <!-- 2. Document Review -->
+                        @if($application->status === 'pending_review')
                             <div class="relative flex items-start space-x-4">
-                                <div class="relative z-10 w-12 h-12 rounded-full {{ $bgColor }} flex items-center justify-center text-white font-bold {{ $isCurrent && !isset($statusInfo['danger']) ? 'animate-pulse' : '' }}">
-                                    @if($isPassed && !$isCurrent)
-                                        <i class="fas fa-check"></i>
-                                    @else
-                                        <i class="fas {{ $statusInfo['icon'] }}"></i>
-                                    @endif
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold animate-pulse">
+                                    <i class="fas fa-spinner fa-pulse"></i>
                                 </div>
-                                <div class="flex-1 {{ $cardBg }} p-4 rounded-lg">
-                                    <h3 class="font-bold {{ $textColor }}">{{ $statusInfo['title'] }}</h3>
-                                    <p class="text-sm {{ $isFuture ? 'text-gray-500' : 'text-gray-600' }} mt-1">{{ $statusInfo['desc'] }}</p>
-                                    @if($statusInfo['date'])
+                                <div class="flex-1 bg-blue-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Under Review</h3>
+                                    <p class="text-sm text-gray-600 mt-1">SB staff is reviewing your documents</p>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        <i class="fas fa-spinner fa-spin mr-1"></i>
+                                        In Progress
+                                    </p>
+                                </div>
+                            </div>
+                        @elseif($application->status === 'incomplete')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="flex-1 bg-orange-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Incomplete Documents</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Additional documents are required</p>
+                                    @if($application->remarks)
+                                        <div class="mt-3 bg-orange-100 border-l-4 border-orange-500 p-2 rounded">
+                                            <p class="text-xs text-orange-800"><strong>Note:</strong> {{ $application->remarks }}</p>
+                                        </div>
+                                    @endif
+                                    @if($application->reviewed_at)
                                         <p class="text-xs text-gray-500 mt-2">
                                             <i class="fas fa-clock mr-1"></i>
-                                            {{ $statusInfo['date']->format('F d, Y - g:i A') }}
+                                            {{ $application->reviewed_at->format('F d, Y - g:i A') }}
                                         </p>
-                                    @elseif($isCurrent)
+                                    @endif
+                                </div>
+                            </div>
+                        @elseif(in_array($application->status, ['for_scheduling', 'inspection_scheduled', 'inspection_pending', 'for_treasury', 'for_approval', 'approved', 'released', 'completed']))
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Documents Reviewed</h3>
+                                    <p class="text-sm text-gray-600 mt-1">All documents verified and approved</p>
+                                    @if($application->reviewed_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->reviewed_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- 3. Inspection Scheduling/Completion -->
+                        @if($application->status === 'for_scheduling')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold animate-pulse">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="flex-1 bg-blue-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Awaiting Inspection Schedule</h3>
+                                    <p class="text-sm text-gray-600 mt-1">SB will schedule your vehicle inspection soon</p>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        <i class="fas fa-spinner fa-spin mr-1"></i>
+                                        In Progress
+                                    </p>
+                                </div>
+                            </div>
+                        @elseif($application->status === 'inspection_scheduled' || $application->status === 'inspection_pending')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Inspection Scheduled</h3>
+                                    @if($application->latestInspection)
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            Scheduled for {{ $application->latestInspection->scheduled_date->format('F d, Y') }}
+                                        </p>
+                                        <p class="text-sm text-gray-600">Inspector: {{ $application->latestInspection->inspector_name }}</p>
+                                        @if($application->latestInspection->location)
+                                            <p class="text-sm text-gray-600">Location: {{ $application->latestInspection->location }}</p>
+                                        @endif
+                                    @else
+                                        <p class="text-sm text-gray-600 mt-1">Your vehicle inspection has been scheduled</p>
+                                    @endif
+                                    @if($application->scheduled_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->scheduled_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            @if($application->status === 'inspection_pending')
+                                <div class="relative flex items-start space-x-4">
+                                    <div class="relative z-10 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold animate-pulse">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <div class="flex-1 bg-blue-50 p-4 rounded-lg">
+                                        <h3 class="font-bold text-gray-800">Inspection In Progress</h3>
+                                        <p class="text-sm text-gray-600 mt-1">Vehicle inspection is currently being conducted</p>
                                         <p class="text-xs text-gray-500 mt-2">
                                             <i class="fas fa-spinner fa-spin mr-1"></i>
                                             In Progress
                                         </p>
-                                    @else
-                                        <p class="text-xs text-gray-400 mt-2">Pending</p>
+                                    </div>
+                                </div>
+                            @endif
+                        @elseif($application->status === 'inspection_failed')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Inspection Scheduled</h3>
+                                    @if($application->latestInspection)
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            Scheduled for {{ $application->latestInspection->scheduled_date->format('F d, Y') }}
+                                        </p>
                                     @endif
-
-                                    @if($isCurrent && $application->remarks)
-                                        <div class="mt-3 bg-yellow-100 border-l-4 border-yellow-500 p-2 rounded">
-                                            <p class="text-xs text-yellow-800"><strong>Note:</strong> {{ $application->remarks }}</p>
-                                        </div>
+                                    @if($application->scheduled_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->scheduled_at->format('F d, Y - g:i A') }}
+                                        </p>
                                     @endif
                                 </div>
                             </div>
-                        @endforeach
+
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <div class="flex-1 bg-red-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Inspection Failed</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Your vehicle did not pass the inspection</p>
+                                    @if($application->latestInspection && $application->latestInspection->remarks)
+                                        <div class="mt-3 bg-red-100 border-l-4 border-red-500 p-2 rounded">
+                                            <p class="text-xs text-red-800"><strong>Issues:</strong> {{ $application->latestInspection->remarks }}</p>
+                                        </div>
+                                    @endif
+                                    @if($application->inspected_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->inspected_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @elseif(in_array($application->status, ['for_treasury', 'for_approval', 'approved', 'released', 'completed']))
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Inspection Passed</h3>
+                                    @if($application->latestInspection)
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            Vehicle inspection completed successfully
+                                        </p>
+                                        @if($application->latestInspection->inspector_name)
+                                            <p class="text-sm text-gray-600">Inspector: {{ $application->latestInspection->inspector_name }}</p>
+                                        @endif
+                                    @else
+                                        <p class="text-sm text-gray-600 mt-1">Your vehicle passed the inspection</p>
+                                    @endif
+                                    @if($application->inspected_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->inspected_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- 4. Payment -->
+                        @if($application->status === 'for_treasury')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold animate-pulse">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="flex-1 bg-blue-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Payment Required</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Please proceed to treasury for payment</p>
+                                    @if($application->latestPayment)
+                                        <p class="text-sm text-blue-700 mt-2">
+                                            <strong>Payment No:</strong> {{ $application->latestPayment->payment_no }}<br>
+                                            <strong>Amount:</strong> ₱{{ number_format($application->latestPayment->total_amount, 2) }}
+                                        </p>
+                                    @endif
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        <i class="fas fa-spinner fa-spin mr-1"></i>
+                                        Awaiting Payment
+                                    </p>
+                                </div>
+                            </div>
+                        @elseif(in_array($application->status, ['for_approval', 'approved', 'released', 'completed']))
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Payment Verified</h3>
+                                    @if($application->latestPayment)
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            Payment of ₱{{ number_format($application->latestPayment->total_amount, 2) }} has been verified
+                                        </p>
+                                        <p class="text-sm text-gray-600">Payment No: {{ $application->latestPayment->payment_no }}</p>
+                                    @else
+                                        <p class="text-sm text-gray-600 mt-1">Payment has been verified</p>
+                                    @endif
+                                    @if($application->payment_verified_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->payment_verified_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- 5. Final Approval -->
+                        @if($application->status === 'for_approval')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold animate-pulse">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div class="flex-1 bg-blue-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Awaiting Final Approval</h3>
+                                    <p class="text-sm text-gray-600 mt-1">SB is reviewing your application for final approval</p>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        <i class="fas fa-spinner fa-spin mr-1"></i>
+                                        In Progress
+                                    </p>
+                                </div>
+                            </div>
+                        @elseif($application->status === 'rejected')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-ban"></i>
+                                </div>
+                                <div class="flex-1 bg-red-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Application Rejected</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Your application was not approved</p>
+                                    @if($application->remarks)
+                                        <div class="mt-3 bg-red-100 border-l-4 border-red-500 p-2 rounded">
+                                            <p class="text-xs text-red-800"><strong>Reason:</strong> {{ $application->remarks }}</p>
+                                        </div>
+                                    @endif
+                                    @if($application->rejected_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->rejected_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @elseif(in_array($application->status, ['approved', 'released', 'completed']))
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Application Approved</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Your franchise application has been approved</p>
+                                    @if($application->date_approved)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->date_approved->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- 6. Documents Released -->
+                        @if($application->status === 'released' || $application->status === 'completed')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg">
+                                    <h3 class="font-bold text-gray-800">Documents Released</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Your franchise documents are ready for pickup</p>
+                                    @if($application->released_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->released_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- 7. Completed -->
+                        @if($application->status === 'completed')
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="flex-1 bg-green-50 p-4 rounded-lg border-2 border-green-500">
+                                    <h3 class="font-bold text-gray-800">Process Completed</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Congratulations! Your franchise application is complete</p>
+                                    @if($application->expiration_date)
+                                        <p class="text-sm text-green-700 mt-2">
+                                            <strong>Valid Until:</strong> {{ $application->expiration_date->format('F d, Y') }}
+                                        </p>
+                                    @endif
+                                    @if($application->completed_at)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $application->completed_at->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

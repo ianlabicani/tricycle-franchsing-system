@@ -83,7 +83,7 @@ class ApplicationController extends Controller
 
     public function show(Application $application)
     {
-        $application->load('latestPayment');
+        $application->load('latestPayment', 'latestInspection');
 
         return view('driver.application.show', compact('application'));
     }
