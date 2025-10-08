@@ -1,13 +1,12 @@
 <?php
 
 use App\Http\Controllers\Driver\ApplicationController;
+use App\Http\Controllers\Driver\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', function () {
-        return view('driver.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Requirements Management
     Route::get('/requirements', function () {
