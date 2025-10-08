@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Sb;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
-use App\Models\Schedule;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
@@ -38,21 +37,66 @@ class ApplicationController extends Controller
 
     public function show(Application $application)
     {
-        $application->load('user');
+        $application->load([
+            'user',
+            'latestInspection',
+            'latestPayment',
+            'reviewedBy',
+            'approvedBy',
+            'rejectedBy',
+            'releasedBy',
+        ]);
 
         return view('sb.applications.show', compact('application'));
     }
 
     public function approve(Application $application)
     {
+        // Application must be in for_approval status
+        if ($application->status !== 'for_approval') {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Application must be in "For Approval" status to be approved.');
+        }
+
         $application->update([
             'status' => 'approved',
-            'approved_at' => now(),
-            'approved_by' => auth()->id(),
         ]);
 
         return redirect()->route('sb.applications.show', $application)
             ->with('success', 'Application approved successfully.');
+    }
+
+    public function release(Application $application)
+    {
+        // Application must be approved
+        if ($application->status !== 'approved') {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Application must be approved before releasing documents.');
+        }
+
+        $application->update([
+            'status' => 'released',
+        ]);
+
+        return redirect()->route('sb.applications.show', $application)
+            ->with('success', 'Documents released successfully.');
+    }
+
+    public function complete(Application $application)
+    {
+        // Application must be released
+        if ($application->status !== 'released') {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Application must have documents released before completing.');
+        }
+
+        $application->update([
+            'status' => 'completed',
+            'date_completed' => now(),
+        ]);
+
+        return redirect()->route('sb.applications.show', $application)
+            ->with('success', 'Application completed successfully.');
     }
 
     public function reject(Request $request, Application $application)
@@ -86,8 +130,6 @@ class ApplicationController extends Controller
         $application->update([
             'status' => $status,
             'remarks' => $request->remarks,
-            'reviewed_at' => now(),
-            'reviewed_by' => auth()->id(),
         ]);
 
         $message = $status === 'for_scheduling'

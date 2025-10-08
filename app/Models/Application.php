@@ -11,11 +11,30 @@ class Application extends Model
         'application_no',
         'queue_number',
         'franchise_type',
+        // Personal Information
+        'full_name',
+        'date_of_birth',
+        'contact_number',
+        'email',
+        'address',
+        // Vehicle Information
+        'plate_number',
+        'engine_number',
+        'chassis_number',
+        'year_model',
+        'make',
+        'color',
+        // Route Information
+        'route',
+        'operating_hours',
+        // Application Details
         'purpose',
         'status',
         'remarks',
         'date_submitted',
         'date_approved',
+        'date_completed',
+        // Lifecycle Tracking
         'reviewed_at',
         'scheduled_at',
         'inspected_at',
@@ -34,8 +53,10 @@ class Application extends Model
     public function casts(): array
     {
         return [
+            'date_of_birth' => 'date',
             'date_submitted' => 'datetime',
             'date_approved' => 'datetime',
+            'date_completed' => 'datetime',
             'reviewed_at' => 'datetime',
             'scheduled_at' => 'datetime',
             'inspected_at' => 'datetime',
@@ -43,8 +64,8 @@ class Application extends Model
             'rejected_at' => 'datetime',
             'released_at' => 'datetime',
             'completed_at' => 'datetime',
-            'expiration_date' => 'date',
-            'renewal_reminder_sent_at' => 'date',
+            'expiration_date' => 'datetime',
+            'renewal_reminder_sent_at' => 'datetime',
         ];
     }
 
@@ -110,19 +131,19 @@ class Application extends Model
     }
 
     /**
-     * Get the schedules for the application.
+     * Get the payments for the application.
      */
-    public function schedules()
+    public function payments()
     {
-        return $this->hasMany(Schedule::class);
+        return $this->hasMany(Payment::class);
     }
 
     /**
-     * Get the latest schedule for the application.
+     * Get the latest payment for the application.
      */
-    public function latestSchedule()
+    public function latestPayment()
     {
-        return $this->hasOne(Schedule::class)->latestOfMany();
+        return $this->hasOne(Payment::class)->latestOfMany();
     }
 
     /**
@@ -130,8 +151,11 @@ class Application extends Model
      */
     public function isRenewable(): bool
     {
-        return $this->expiration_date &&
-               $this->expiration_date->isPast() ||
+        if (!$this->expiration_date) {
+            return false;
+        }
+
+        return $this->expiration_date->isPast() ||
                $this->expiration_date->diffInDays(now()) <= 30;
     }
 

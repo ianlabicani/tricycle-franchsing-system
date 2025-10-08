@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\SB\ApplicationController;
 use App\Http\Controllers\SB\InspectionController;
-use App\Http\Controllers\SB\ScheduleController;
+use App\Http\Controllers\SB\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(function () {
@@ -17,6 +17,16 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::post('/applications/{application}/approve', [ApplicationController::class, 'approve'])->name('applications.approve');
     Route::post('/applications/{application}/reject', [ApplicationController::class, 'reject'])->name('applications.reject');
     Route::post('/applications/{application}/review', [ApplicationController::class, 'review'])->name('applications.review');
+    Route::post('/applications/{application}/release', [ApplicationController::class, 'release'])->name('applications.release');
+    Route::post('/applications/{application}/complete', [ApplicationController::class, 'complete'])->name('applications.complete');
+
+    // Payment Management
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+    Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
+    Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
+    Route::post('/payments/{payment}/cancel', [PaymentController::class, 'cancel'])->name('payments.cancel');
 
     // Inspection Management
     Route::get('/inspections', [InspectionController::class, 'index'])->name('inspections.index');
@@ -27,14 +37,5 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::put('/inspections/{inspection}', [InspectionController::class, 'update'])->name('inspections.update');
     Route::post('/inspections/{inspection}/complete', [InspectionController::class, 'complete'])->name('inspections.complete');
     Route::post('/inspections/{inspection}/cancel', [InspectionController::class, 'cancel'])->name('inspections.cancel');
-
-    // Schedule Management
-    Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
-    Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('schedules.create');
-    Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
-    Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show');
-    Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedules.edit');
-    Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
-    Route::post('/schedules/{schedule}/cancel', [ScheduleController::class, 'cancel'])->name('schedules.cancel');
 });
 

@@ -46,6 +46,20 @@
                 <i class="fas fa-ban"></i>
                 <span>Cancel</span>
             </button>
+            @elseif($inspection->status === 'completed' && $inspection->result === 'passed')
+                @if($inspection->application->latestPayment)
+                    <!-- Payment exists - show view payment button -->
+                    <a href="{{ route('sb.payments.show', $inspection->application->latestPayment) }}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition flex items-center space-x-2">
+                        <i class="fas fa-eye"></i>
+                        <span>View Payment</span>
+                    </a>
+                @else
+                    <!-- No payment - show create payment button -->
+                    <a href="{{ route('sb.payments.create', ['application_id' => $inspection->application_id]) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition flex items-center space-x-2">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Create Payment Record</span>
+                    </a>
+                @endif
             @endif
         </div>
     </div>
@@ -195,6 +209,46 @@
                         <p class="text-sm text-gray-500">Completed At</p>
                         <p class="text-base font-semibold text-gray-900">{{ $inspection->completed_at->format('F d, Y \a\t h:i A') }}</p>
                     </div>
+
+                    @if($inspection->result === 'passed')
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        @if($inspection->application->latestPayment)
+                            <!-- Payment already exists -->
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-green-800">Payment Record Created</p>
+                                        <p class="text-sm text-green-700 mt-1">
+                                            Payment No: <span class="font-mono font-bold">{{ $inspection->application->latestPayment->payment_no }}</span>
+                                        </p>
+                                        <a href="{{ route('sb.payments.show', $inspection->application->latestPayment) }}" class="inline-flex items-center mt-3 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition">
+                                            <i class="fas fa-eye mr-2"></i>
+                                            View Payment Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <!-- No payment created yet -->
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                                <div class="flex items-start">
+                                    <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-yellow-800">Payment Record Required</p>
+                                        <p class="text-sm text-yellow-700 mt-1">
+                                            Inspection passed. Create a payment record to proceed with treasury payment.
+                                        </p>
+                                        <a href="{{ route('sb.payments.create', ['application_id' => $inspection->application_id]) }}" class="inline-flex items-center mt-3 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition">
+                                            <i class="fas fa-plus-circle mr-2"></i>
+                                            Create Payment Record
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                    @endif
                 </div>
             </div>
             @endif
@@ -293,7 +347,6 @@
             <h3 class="text-lg font-medium text-gray-900 text-center mt-4">Complete Inspection</h3>
             <form action="{{ route('sb.inspections.complete', $inspection) }}" method="POST" class="mt-4">
                 @csrf
-                @method('PATCH')
 
                 <div class="space-y-4">
                     <div>

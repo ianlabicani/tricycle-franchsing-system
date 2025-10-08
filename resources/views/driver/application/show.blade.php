@@ -18,7 +18,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">Application Details</h1>
-                <p class="text-gray-600 mt-2">Application ID: {{ $application->id ?? 'FR-2025-0123' }}</p>
+                <p class="text-gray-600 mt-2">{{ $application->application_no }}</p>
             </div>
             <a href="{{ route('driver.application') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Applications
@@ -31,19 +31,19 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-2xl font-bold mb-2">Application Status</h2>
-                <p class="text-blue-100 mb-4">{{ $application->status ?? 'In Progress' }}</p>
+                <p class="text-blue-100 mb-4">{{ $application->status_label }}</p>
                 <div class="flex items-center space-x-4">
                     <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
-                        <p class="text-blue-100 text-sm">Application ID</p>
-                        <p class="text-xl font-bold">{{ $application->id ?? 'FR-2025-0123' }}</p>
+                        <p class="text-blue-100 text-sm">Application No.</p>
+                        <p class="text-xl font-bold">{{ $application->application_no }}</p>
                     </div>
                     <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
                         <p class="text-blue-100 text-sm">Submitted On</p>
-                        <p class="text-xl font-bold">{{ $application->date_submitted ?? 'Oct 4, 2025' }}</p>
+                        <p class="text-xl font-bold">{{ $application->date_submitted ? $application->date_submitted->format('M d, Y') : 'Not yet submitted' }}</p>
                     </div>
                     <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2">
                         <p class="text-blue-100 text-sm">Type</p>
-                        <p class="text-xl font-bold">{{ ucfirst($application->franchise_type ?? 'New') }}</p>
+                        <p class="text-xl font-bold">{{ ucfirst($application->franchise_type) }}</p>
                     </div>
                 </div>
             </div>
@@ -62,14 +62,13 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-gray-800">Application Information</h2>
+                    @if(in_array($application->status, ['draft', 'incomplete']))
                     <div class="flex space-x-2">
-                        <a href="{{ route('driver.application.edit', $application->id ?? 1) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold">
+                        <a href="{{ route('driver.application.edit', $application) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold">
                             <i class="fas fa-edit mr-1"></i>Edit
                         </a>
-                        <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-semibold">
-                            <i class="fas fa-download mr-1"></i>Download PDF
-                        </button>
                     </div>
+                    @endif
                 </div>
 
                 <div class="space-y-6">
@@ -79,23 +78,23 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Full Name</label>
-                                <p class="text-gray-800 font-semibold">{{ Auth::user()->name }}</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->full_name ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Date of Birth</label>
-                                <p class="text-gray-800 font-semibold">January 15, 1985</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->date_of_birth ? $application->date_of_birth->format('F d, Y') : 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Contact Number</label>
-                                <p class="text-gray-800 font-semibold">+63 912 345 6789</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->contact_number ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Email Address</label>
-                                <p class="text-gray-800 font-semibold">{{ Auth::user()->email }}</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->email ?? 'N/A' }}</p>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Complete Address</label>
-                                <p class="text-gray-800 font-semibold">123 Main Street, Barangay Centro, City, Province</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->address ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
@@ -106,27 +105,27 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Plate Number</label>
-                                <p class="text-gray-800 font-semibold">ABC-1234</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->plate_number ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Engine Number</label>
-                                <p class="text-gray-800 font-semibold">EN123456789</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->engine_number ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Chassis Number</label>
-                                <p class="text-gray-800 font-semibold">CH987654321</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->chassis_number ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Year Model</label>
-                                <p class="text-gray-800 font-semibold">2020</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->year_model ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Make/Brand</label>
-                                <p class="text-gray-800 font-semibold">Honda</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->make ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Color</label>
-                                <p class="text-gray-800 font-semibold">Blue</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->color ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
@@ -137,11 +136,11 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Preferred Route</label>
-                                <p class="text-gray-800 font-semibold">Route A (Church - Market - Terminal)</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->route ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Operating Hours</label>
-                                <p class="text-gray-800 font-semibold">6:00 AM - 8:00 PM</p>
+                                <p class="text-gray-800 font-semibold">{{ $application->operating_hours ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
@@ -166,6 +165,68 @@
                 </div>
             </div>
 
+            <!-- Payment Information (only shown when status is for_treasury) -->
+            @if($application->status === 'for_treasury' && $application->latestPayment)
+            <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-2">
+                            <i class="fas fa-money-bill-wave mr-2"></i>Payment Required
+                        </h2>
+                        <p class="text-green-100">Your inspection has passed. Please proceed to treasury for payment.</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <i class="fas fa-receipt text-4xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white text-gray-800 rounded-lg p-6 mb-4">
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b">
+                        <div>
+                            <p class="text-sm text-gray-600">Payment Number</p>
+                            <p class="text-xl font-bold text-purple-600">{{ $application->latestPayment->payment_no }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Total Amount</p>
+                            <p class="text-3xl font-bold text-green-600">₱{{ number_format($application->latestPayment->total_amount, 2) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="font-bold text-gray-800 mb-3">Payment Breakdown</h3>
+                        @foreach($application->latestPayment->payment_items as $item)
+                        <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span class="text-gray-700">{{ $item['name'] }}</span>
+                            <span class="font-semibold text-gray-800">₱{{ number_format($item['amount'], 2) }}</span>
+                        </div>
+                        @endforeach
+                        <div class="flex items-center justify-between py-3 bg-green-50 px-3 rounded-lg mt-3">
+                            <span class="font-bold text-gray-800">TOTAL</span>
+                            <span class="font-bold text-green-600 text-xl">₱{{ number_format($application->latestPayment->total_amount, 2) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white bg-opacity-20 rounded-lg p-4 border-l-4 border-white">
+                    <h3 class="font-bold text-white mb-2"><i class="fas fa-info-circle mr-1"></i> Payment Instructions</h3>
+                    <ol class="space-y-2 text-green-100 text-sm">
+                        <li><strong>1.</strong> Proceed to the SB Treasury Office</li>
+                        <li><strong>2.</strong> Present this Payment Number: <span class="font-mono font-bold bg-white bg-opacity-20 px-2 py-1 rounded">{{ $application->latestPayment->payment_no }}</span></li>
+                        <li><strong>3.</strong> Pay the total amount of <strong>₱{{ number_format($application->latestPayment->total_amount, 2) }}</strong></li>
+                        <li><strong>4.</strong> Keep your official receipt for your records</li>
+                        <li><strong>5.</strong> After payment verification, your application will proceed to final approval</li>
+                    </ol>
+                </div>
+
+                <div class="mt-4 bg-yellow-100 border-l-4 border-yellow-500 p-3 rounded">
+                    <p class="text-yellow-800 text-sm">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        <strong>Important:</strong> Payment must be made within 30 days. After payment, please allow 1-2 business days for verification before your application proceeds to final approval.
+                    </p>
+                </div>
+            </div>
+            @endif
+
             <!-- Application Timeline -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-6">Application Timeline</h2>
@@ -175,40 +236,103 @@
                     <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-300"></div>
 
                     <div class="space-y-6">
-                        <!-- Step 1 -->
-                        <div class="relative flex items-start space-x-4">
-                            <div class="relative z-10 w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <div class="flex-1 bg-green-50 p-4 rounded-lg">
-                                <h3 class="font-bold text-gray-800">Application Submitted</h3>
-                                <p class="text-sm text-gray-600 mt-1">Application form completed and submitted</p>
-                                <p class="text-xs text-gray-500 mt-2">{{ $application->date_submitted ?? 'October 4, 2025 - 2:15 PM' }}</p>
-                            </div>
-                        </div>
+                        @php
+                            $statuses = [
+                                'draft' => ['icon' => 'fa-file-alt', 'title' => 'Draft Created', 'desc' => 'Application form created', 'date' => $application->created_at],
+                                'pending_review' => ['icon' => 'fa-paper-plane', 'title' => 'Application Submitted', 'desc' => 'Submitted for SB Staff review', 'date' => $application->date_submitted],
+                                'incomplete' => ['icon' => 'fa-exclamation-circle', 'title' => 'Incomplete Requirements', 'desc' => 'Additional documents required', 'date' => $application->reviewed_at, 'warning' => true],
+                                'for_scheduling' => ['icon' => 'fa-check-circle', 'title' => 'Review Completed', 'desc' => 'Ready for inspection scheduling', 'date' => $application->reviewed_at],
+                                'inspection_scheduled' => ['icon' => 'fa-calendar-check', 'title' => 'Inspection Scheduled', 'desc' => 'Inspection date and time set', 'date' => $application->scheduled_at],
+                                'inspection_pending' => ['icon' => 'fa-clipboard-check', 'title' => 'Awaiting Inspection', 'desc' => 'Vehicle inspection in progress', 'date' => $application->scheduled_at],
+                                'inspection_failed' => ['icon' => 'fa-times-circle', 'title' => 'Inspection Failed', 'desc' => 'Vehicle did not pass inspection', 'date' => $application->inspected_at, 'danger' => true],
+                                'for_treasury' => ['icon' => 'fa-money-bill-wave', 'title' => 'For Payment', 'desc' => 'Proceed to treasury for payment', 'date' => $application->inspected_at],
+                                'for_approval' => ['icon' => 'fa-hourglass-half', 'title' => 'For Final Approval', 'desc' => 'Payment verified, awaiting SB approval', 'date' => $application->payment_verified_at],
+                                'approved' => ['icon' => 'fa-check-double', 'title' => 'Application Approved', 'desc' => 'Approved by SB officials', 'date' => $application->date_approved],
+                                'rejected' => ['icon' => 'fa-ban', 'title' => 'Application Rejected', 'desc' => 'Application was not approved', 'date' => $application->rejected_at, 'danger' => true],
+                                'released' => ['icon' => 'fa-file-export', 'title' => 'Documents Released', 'desc' => 'Franchise documents ready for pickup', 'date' => $application->released_at],
+                                'completed' => ['icon' => 'fa-trophy', 'title' => 'Process Completed', 'desc' => 'All requirements fulfilled', 'date' => $application->completed_at],
+                                'for_renewal' => ['icon' => 'fa-redo', 'title' => 'For Renewal', 'desc' => 'Franchise due for renewal', 'date' => $application->expiration_date],
+                            ];
 
-                        <!-- Step 2 -->
-                        <div class="relative flex items-start space-x-4">
-                            <div class="relative z-10 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold animate-pulse">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="flex-1 bg-blue-50 p-4 rounded-lg">
-                                <h3 class="font-bold text-gray-800">Under Review</h3>
-                                <p class="text-sm text-gray-600 mt-1">Application is being reviewed by SB Staff</p>
-                                <p class="text-xs text-gray-500 mt-2">In Progress</p>
-                            </div>
-                        </div>
+                            $currentStatusIndex = array_search($application->status, array_keys($statuses));
+                            $statusIndex = 0;
+                        @endphp
 
-                        <!-- Step 3 -->
-                        <div class="relative flex items-start space-x-4">
-                            <div class="relative z-10 w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold">
-                                3
+                        @foreach($statuses as $statusKey => $statusInfo)
+                            @php
+                                $thisStatusIndex = $statusIndex++;
+                                $isPassed = $thisStatusIndex < $currentStatusIndex || $statusKey === $application->status;
+                                $isCurrent = $statusKey === $application->status;
+                                $isFuture = $thisStatusIndex > $currentStatusIndex;
+
+                                // Skip certain statuses if not relevant
+                                if ($statusKey === 'incomplete' && $application->status !== 'incomplete' && !in_array('incomplete', [$application->status])) {
+                                    continue;
+                                }
+                                if ($statusKey === 'inspection_failed' && $application->status !== 'inspection_failed') {
+                                    continue;
+                                }
+                                if ($statusKey === 'rejected' && $application->status !== 'rejected') {
+                                    continue;
+                                }
+
+                                // Determine colors
+                                if (isset($statusInfo['danger'])) {
+                                    $bgColor = 'bg-red-500';
+                                    $cardBg = 'bg-red-50';
+                                    $textColor = 'text-gray-800';
+                                } elseif (isset($statusInfo['warning'])) {
+                                    $bgColor = 'bg-orange-500';
+                                    $cardBg = 'bg-orange-50';
+                                    $textColor = 'text-gray-800';
+                                } elseif ($isCurrent) {
+                                    $bgColor = 'bg-blue-500';
+                                    $cardBg = 'bg-blue-50';
+                                    $textColor = 'text-gray-800';
+                                } elseif ($isPassed) {
+                                    $bgColor = 'bg-green-500';
+                                    $cardBg = 'bg-green-50';
+                                    $textColor = 'text-gray-800';
+                                } else {
+                                    $bgColor = 'bg-gray-300';
+                                    $cardBg = 'bg-gray-50';
+                                    $textColor = 'text-gray-600';
+                                }
+                            @endphp
+
+                            <div class="relative flex items-start space-x-4">
+                                <div class="relative z-10 w-12 h-12 rounded-full {{ $bgColor }} flex items-center justify-center text-white font-bold {{ $isCurrent && !isset($statusInfo['danger']) ? 'animate-pulse' : '' }}">
+                                    @if($isPassed && !$isCurrent)
+                                        <i class="fas fa-check"></i>
+                                    @else
+                                        <i class="fas {{ $statusInfo['icon'] }}"></i>
+                                    @endif
+                                </div>
+                                <div class="flex-1 {{ $cardBg }} p-4 rounded-lg">
+                                    <h3 class="font-bold {{ $textColor }}">{{ $statusInfo['title'] }}</h3>
+                                    <p class="text-sm {{ $isFuture ? 'text-gray-500' : 'text-gray-600' }} mt-1">{{ $statusInfo['desc'] }}</p>
+                                    @if($statusInfo['date'])
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-clock mr-1"></i>
+                                            {{ $statusInfo['date']->format('F d, Y - g:i A') }}
+                                        </p>
+                                    @elseif($isCurrent)
+                                        <p class="text-xs text-gray-500 mt-2">
+                                            <i class="fas fa-spinner fa-spin mr-1"></i>
+                                            In Progress
+                                        </p>
+                                    @else
+                                        <p class="text-xs text-gray-400 mt-2">Pending</p>
+                                    @endif
+
+                                    @if($isCurrent && $application->remarks)
+                                        <div class="mt-3 bg-yellow-100 border-l-4 border-yellow-500 p-2 rounded">
+                                            <p class="text-xs text-yellow-800"><strong>Note:</strong> {{ $application->remarks }}</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="flex-1 bg-gray-50 p-4 rounded-lg">
-                                <h3 class="font-bold text-gray-600">Final Approval</h3>
-                                <p class="text-sm text-gray-500 mt-1">Pending review completion</p>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -226,16 +350,16 @@
                     <div class="flex items-center justify-between pb-3 border-b">
                         <span class="text-gray-600">Status</span>
                         <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
-                            {{ $application->status ?? 'In Progress' }}
+                            {{ $application->status_label }}
                         </span>
                     </div>
                     <div class="flex items-center justify-between pb-3 border-b">
                         <span class="text-gray-600">Type</span>
-                        <span class="font-bold text-gray-800">{{ ucfirst($application->franchise_type ?? 'New') }}</span>
+                        <span class="font-bold text-gray-800">{{ ucfirst($application->franchise_type) }}</span>
                     </div>
                     <div class="flex items-center justify-between pb-3 border-b">
                         <span class="text-gray-600">Submitted</span>
-                        <span class="font-bold text-gray-800">{{ $application->date_submitted ?? 'Oct 4, 2025' }}</span>
+                        <span class="font-bold text-gray-800">{{ $application->date_submitted ? $application->date_submitted->format('M d, Y') : 'Not yet' }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-gray-600">Processing Time</span>

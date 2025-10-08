@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SB;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Inspection;
+use App\Models\Payment;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,6 @@ class InspectionController extends Controller
         // Statistics
         $stats = [
             'total' => Inspection::count(),
-            'scheduled' => Inspection::where('status', 'scheduled')->count(),
             'completed' => Inspection::where('status', 'completed')->count(),
             'cancelled' => Inspection::where('status', 'cancelled')->count(),
             'pass_rate' => Inspection::where('status', 'completed')->count() > 0
@@ -45,6 +45,12 @@ class InspectionController extends Controller
 
         if ($applicationId) {
             $application = Application::with('user')->findOrFail($applicationId);
+
+            // Check if application is in the correct status for inspection
+            if (! in_array($application->status, ['for_scheduling', 'inspection_scheduled'])) {
+                return redirect()->route('sb.applications.show', $application)
+                    ->with('error', 'Application must have a schedule before creating an inspection.');
+            }
         }
 
         return view('sb.inspections.create', compact('application'));
@@ -54,12 +60,20 @@ class InspectionController extends Controller
     {
         $request->validate([
             'application_id' => 'required|exists:applications,id',
-            'scheduled_date' => 'required|date|after:today',
+            'scheduled_date' => 'required|date|after_or_equal:today',
             'scheduled_time' => 'required',
             'inspector_name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
             'notes' => 'nullable|string|max:500',
         ]);
+
+        $application = Application::findOrFail($request->application_id);
+
+        // Check if application is in the correct status
+        if (! in_array($application->status, ['for_scheduling', 'inspection_scheduled'])) {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Application must have a schedule before creating an inspection.');
+        }
 
         $inspection = Inspection::create([
             'application_id' => $request->application_id,
@@ -69,14 +83,12 @@ class InspectionController extends Controller
             'location' => $request->location,
             'notes' => $request->notes,
             'status' => 'scheduled',
-            'scheduled_by' => auth()->id(),
+            'scheduled_by' => $request->user()->id,
         ]);
 
         // Update application status
-        $application = Application::find($request->application_id);
         $application->update([
             'status' => 'inspection_scheduled',
-            'scheduled_at' => now(),
         ]);
 
         return redirect()->route('sb.inspections.show', $inspection)
@@ -85,7 +97,7 @@ class InspectionController extends Controller
 
     public function show(Inspection $inspection)
     {
-        $inspection->load(['application.user']);
+        $inspection->load(['application.user', 'application.latestPayment']);
 
         return view('sb.inspections.show', compact('inspection'));
     }
@@ -137,15 +149,14 @@ class InspectionController extends Controller
         // Update application status based on result
         $application = $inspection->application;
         if ($request->result === 'passed') {
+            // Only update status - don't create payment automatically
             $application->update([
                 'status' => 'for_treasury',
-                'inspected_at' => now(),
             ]);
         } else {
             $application->update([
                 'status' => 'inspection_failed',
                 'remarks' => $request->remarks,
-                'inspected_at' => now(),
             ]);
         }
 
