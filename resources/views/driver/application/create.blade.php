@@ -85,24 +85,53 @@
                     <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b">Personal Information</h2>
                     <div class="grid md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
-                            <input type="text" name="full_name" value="{{ Auth::user()->name }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="first_name" value="{{ Auth::user()->profile?->first_name ?? old('first_name') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            @error('first_name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name <span class="text-gray-500 text-sm">(Optional)</span></label>
+                            <input type="text" name="middle_name" value="{{ Auth::user()->profile?->middle_name ?? old('middle_name') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            @error('middle_name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="last_name" value="{{ Auth::user()->profile?->last_name ?? old('last_name') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            @error('last_name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth <span class="text-red-500">*</span></label>
-                            <input type="date" name="date_of_birth" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            <input type="date" name="date_of_birth" value="{{ Auth::user()->profile?->date_of_birth ?? old('date_of_birth') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            @error('date_of_birth')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number <span class="text-red-500">*</span></label>
-                            <input type="tel" name="contact_number" placeholder="+63 912 345 6789" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            <input type="tel" name="contact_number" value="{{ Auth::user()->profile?->contact_number ?? old('contact_number') }}" placeholder="+63 912 345 6789" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            @error('contact_number')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email Address <span class="text-red-500">*</span></label>
                             <input type="email" name="email" value="{{ Auth::user()->email }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            @error('email')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Complete Address <span class="text-red-500">*</span></label>
-                            <input type="text" name="address" placeholder="House/Unit No., Street, Barangay, City, Province" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            <input type="text" name="address" value="{{ Auth::user()->profile?->address ?? old('address') }}" placeholder="House/Unit No., Street, Barangay, City, Province" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            @error('address')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -131,10 +160,6 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Make/Brand <span class="text-red-500">*</span></label>
                             <input type="text" name="make" placeholder="Honda" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Color <span class="text-red-500">*</span></label>
-                            <input type="text" name="color" placeholder="Blue" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
                     </div>
                 </div>
 
@@ -146,11 +171,34 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Route <span class="text-red-500">*</span></label>
                             <select name="route" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
                                 <option value="">Select Route</option>
-                                <option value="route_a">Route A (Church - Market - Terminal)</option>
-                                <option value="route_b">Route B (School - Plaza - Terminal)</option>
-                                <option value="route_c">Route C (Hospital - Town Hall - Terminal)</option>
-                                <option value="route_d">Route D (Station - Mall - Terminal)</option>
+                                <option value="line1" {{ old('route') === 'line1' ? 'selected' : '' }}>
+                                    🔴 Line 1 - Red (Jurisdiction - Magapit Route)
+                                </option>
+                                <option value="line2" {{ old('route') === 'line2' ? 'selected' : '' }}>
+                                    🟠 Line 2 - Orange (Public Market/Cagoran-Binag - Sta. Teresa & Cambong)
+                                </option>
+                                <option value="line3" {{ old('route') === 'line3' ? 'selected' : '' }}>
+                                    🔵 Line 3 - Blue (Magapit-Dagupan)
+                                </option>
+                                <option value="line4" {{ old('route') === 'line4' ? 'selected' : '' }}>
+                                    🟢 Line 4 - Green (Junction-Sta. Maria Route)
+                                </option>
+                                <option value="line5" {{ old('route') === 'line5' ? 'selected' : '' }}>
+                                    🟡 Line 5 - Yellow (Junction San Lorenzo - Malanao)
+                                </option>
+                                <option value="line6" {{ old('route') === 'line6' ? 'selected' : '' }}>
+                                    ⚪ Line 6 - White (Junction Magapit - Cabayabasan via Logac)
+                                </option>
+                                <option value="line7" {{ old('route') === 'line7' ? 'selected' : '' }}>
+                                    🟤 Line 7 - Brown (Public Market - Dalaya & Paranum Route)
+                                </option>
+                                <option value="line8" {{ old('route') === 'line8' ? 'selected' : '' }}>
+                                    🟣 Line 8 - Violet (Abagao-San Juan-Bical & Fusina Route)
+                                </option>
                             </select>
+                            @error('route')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Operating Hours <span class="text-red-500">*</span></label>

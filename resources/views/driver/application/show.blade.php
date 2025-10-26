@@ -123,10 +123,6 @@
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Make/Brand</label>
                                 <p class="text-gray-800 font-semibold">{{ $application->make ?? 'N/A' }}</p>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-500 mb-1">Color</label>
-                                <p class="text-gray-800 font-semibold">{{ $application->color ?? 'N/A' }}</p>
-                            </div>
                         </div>
                     </div>
 
@@ -136,7 +132,18 @@
                         <div class="grid md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Preferred Route</label>
-                                <p class="text-gray-800 font-semibold">{{ $application->route ?? 'N/A' }}</p>
+                                @php
+                                    $route = $application->route;
+                                    $routeData = \App\Helpers\RouteHelper::getRoute($route);
+                                @endphp
+                                @if($routeData)
+                                    <div class="inline-flex items-center px-4 py-2 rounded-lg border-2 {{ \App\Helpers\RouteHelper::getTailwindColorClass($routeData['color']) }}">
+                                        <span class="font-semibold">{{ $routeData['name'] }} - {{ ucfirst($routeData['color']) }}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-2">{{ $routeData['description'] }}</p>
+                                @else
+                                    <p class="text-gray-800 font-semibold">{{ $route ?? 'N/A' }}</p>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-500 mb-1">Operating Hours</label>

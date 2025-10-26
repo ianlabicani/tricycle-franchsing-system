@@ -12,6 +12,9 @@ class Application extends Model
         'queue_number',
         'franchise_type',
         // Personal Information
+        'first_name',
+        'middle_name',
+        'last_name',
         'full_name',
         'date_of_birth',
         'contact_number',
@@ -23,7 +26,6 @@ class Application extends Model
         'chassis_number',
         'year_model',
         'make',
-        'color',
         // Route Information
         'route',
         'operating_hours',
@@ -151,7 +153,7 @@ class Application extends Model
      */
     public function isRenewable(): bool
     {
-        if (!$this->expiration_date) {
+        if (! $this->expiration_date) {
             return false;
         }
 
@@ -164,7 +166,7 @@ class Application extends Model
      */
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'Draft',
             'pending_review' => 'Pending Review',
             'incomplete' => 'Incomplete',
@@ -188,7 +190,7 @@ class Application extends Model
      */
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'gray',
             'pending_review' => 'yellow',
             'incomplete' => 'orange',

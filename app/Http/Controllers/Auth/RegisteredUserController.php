@@ -30,15 +30,26 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'preferred_route' => ['required', 'string', 'in:line1,line2,line3,line4,line5,line6,line7,line8'],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'name' => trim($request->first_name . ' ' . $request->middle_name . ' ' . $request->last_name),
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'preferred_route' => $request->preferred_route,
+        ]);
+
+        // Create user profile with normalized name
+        $user->profile()->create([
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
         ]);
 
         // Assign driver role to the new user

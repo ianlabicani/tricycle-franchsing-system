@@ -33,7 +33,9 @@ class ApplicationController extends Controller
         $validated = $request->validate([
             'franchise_type' => 'required|in:new,renewal,amendment',
             // Personal Information
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date|before:today',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255',
@@ -44,7 +46,6 @@ class ApplicationController extends Controller
             'chassis_number' => 'required|string|max:50',
             'year_model' => 'required|integer|min:1990|max:'.(date('Y') + 1),
             'make' => 'required|string|max:100',
-            'color' => 'required|string|max:50',
             // Route Information
             'route' => 'required|string',
             'operating_hours' => 'required|string|max:100',
@@ -52,11 +53,17 @@ class ApplicationController extends Controller
             'purpose' => 'nullable|string|max:1000',
         ]);
 
+        // Build full name from components
+        $fullName = trim($validated['first_name'] . ' ' . $validated['middle_name'] . ' ' . $validated['last_name']);
+
         $application = Application::create([
             'user_id' => $user->id,
             'franchise_type' => $validated['franchise_type'],
             // Personal Information
-            'full_name' => $validated['full_name'],
+            'full_name' => $fullName,
+            'first_name' => $validated['first_name'],
+            'middle_name' => $validated['middle_name'],
+            'last_name' => $validated['last_name'],
             'date_of_birth' => $validated['date_of_birth'],
             'contact_number' => $validated['contact_number'],
             'email' => $validated['email'],
@@ -67,7 +74,6 @@ class ApplicationController extends Controller
             'chassis_number' => $validated['chassis_number'],
             'year_model' => $validated['year_model'],
             'make' => $validated['make'],
-            'color' => $validated['color'],
             // Route Information
             'route' => $validated['route'],
             'operating_hours' => $validated['operating_hours'],
@@ -114,7 +120,9 @@ class ApplicationController extends Controller
         $validated = $request->validate([
             'franchise_type' => 'required|in:new,renewal,amendment',
             // Personal Information
-            'full_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date|before:today',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|max:255',
@@ -125,7 +133,6 @@ class ApplicationController extends Controller
             'chassis_number' => 'required|string|max:50',
             'year_model' => 'required|integer|min:1990|max:'.(date('Y') + 1),
             'make' => 'required|string|max:100',
-            'color' => 'required|string|max:50',
             // Route Information
             'route' => 'required|string',
             'operating_hours' => 'required|string|max:100',
@@ -133,7 +140,28 @@ class ApplicationController extends Controller
             'purpose' => 'nullable|string|max:1000',
         ]);
 
-        $application->update($validated);
+        // Build full name from components
+        $fullName = trim($validated['first_name'] . ' ' . $validated['middle_name'] . ' ' . $validated['last_name']);
+
+        $application->update([
+            'franchise_type' => $validated['franchise_type'],
+            'full_name' => $fullName,
+            'first_name' => $validated['first_name'],
+            'middle_name' => $validated['middle_name'],
+            'last_name' => $validated['last_name'],
+            'date_of_birth' => $validated['date_of_birth'],
+            'contact_number' => $validated['contact_number'],
+            'email' => $validated['email'],
+            'address' => $validated['address'],
+            'plate_number' => $validated['plate_number'],
+            'engine_number' => $validated['engine_number'],
+            'chassis_number' => $validated['chassis_number'],
+            'year_model' => $validated['year_model'],
+            'make' => $validated['make'],
+            'route' => $validated['route'],
+            'operating_hours' => $validated['operating_hours'],
+            'purpose' => $validated['purpose'],
+        ]);
 
         // If status was incomplete, change to pending_review upon resubmission
         if ($application->status === 'incomplete') {
