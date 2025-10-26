@@ -46,6 +46,7 @@ class Application extends Model
         'completed_at',
         'expiration_date',
         'renewal_reminder_sent_at',
+        'archived_at',
         'reviewed_by',
         'approved_by',
         'rejected_by',
@@ -70,17 +71,18 @@ class Application extends Model
             'completed_at' => 'datetime',
             'expiration_date' => 'datetime',
             'renewal_reminder_sent_at' => 'datetime',
+            'archived_at' => 'datetime',
         ];
     }
 
     /**
-     * Check if a user has an active (not finished) application.
-     * "Active" means not completed, released, or rejected.
+     * Check if a user has an active application.
+     * "Active" means not completed, released, rejected, or archived.
      */
     public static function userHasActive($userId): bool
     {
         return self::where('user_id', $userId)
-            ->whereNotIn('status', ['completed', 'released', 'rejected'])
+            ->whereNotIn('status', ['completed', 'released', 'rejected', 'archived'])
             ->exists();
     }
 

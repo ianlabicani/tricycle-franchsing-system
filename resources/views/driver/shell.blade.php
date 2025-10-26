@@ -47,10 +47,15 @@
 
                 <!-- Notifications -->
                 <div class="relative">
-                    <button class="text-white hover:bg-blue-500 p-2 rounded-lg transition relative">
+                    <a href="{{ route('driver.notifications') }}" class="text-white hover:bg-blue-500 p-2 rounded-lg transition relative">
                         <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                    </button>
+                        @php
+                            $unreadNotifications = Auth::user()->notifications()->whereNull('read_at')->count();
+                        @endphp
+                        @if($unreadNotifications > 0)
+                            <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">{{ $unreadNotifications > 9 ? '9+' : $unreadNotifications }}</span>
+                        @endif
+                    </a>
                 </div>
 
                 <!-- User Dropdown -->

@@ -22,14 +22,45 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">New Franchise Application</h1>
-                <p class="text-gray-600 mt-2">Submit a new franchise application</p>
+                <h1 class="text-3xl font-bold text-gray-800">
+                    @if($lastApp && $lastApp->status === 'for_renewal')
+                        Renew Your Franchise
+                    @elseif($lastApp && $lastApp->status === 'completed')
+                        Renew Your Franchise
+                    @else
+                        New Franchise Application
+                    @endif
+                </h1>
+                <p class="text-gray-600 mt-2">
+                    @if($lastApp && $lastApp->status === 'for_renewal')
+                        Your franchise has expired. Please submit a renewal application to continue operating.
+                    @elseif($lastApp && $lastApp->status === 'completed')
+                        Renew your existing franchise for another 3 years.
+                    @else
+                        Submit a new franchise application
+                    @endif
+                </p>
             </div>
             <a href="{{ route('driver.application') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Applications
             </a>
         </div>
     </div>
+
+    @if($lastApp && in_array($lastApp->status, ['for_renewal', 'completed']))
+        <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-lg mr-3 mt-1"></i>
+                <div>
+                    <h3 class="font-bold text-yellow-800 mb-1">Renewal Information</h3>
+                    <p class="text-yellow-700 text-sm">
+                        Your current franchise ({{ $lastApp->application_no }}) will expire on <strong>{{ $lastApp->expiration_date->format('F d, Y') }}</strong>.
+                        Submit this renewal application to extend your franchise for another 3 years.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

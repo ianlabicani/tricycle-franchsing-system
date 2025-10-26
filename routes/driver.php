@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Driver\ApplicationController;
 use App\Http\Controllers\Driver\DashboardController;
+use App\Http\Controllers\Driver\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->group(function () {
@@ -50,9 +51,9 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
     })->name('renewals');
 
     // Notifications
-    Route::get('/notifications', function () {
-        return view('driver.notifications');
-    })->name('notifications');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
+    Route::post('/notifications/{notification}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 
     // Help & Support
     Route::get('/help', function () {

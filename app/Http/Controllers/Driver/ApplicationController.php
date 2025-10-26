@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Driver;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\ApplicationDocument;
+use App\Notifications\RenewalSubmittedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -43,18 +44,26 @@ class ApplicationController extends Controller
     public function create()
     {
         $user = auth()->user();
-        if (Application::userHasActive($user->id)) {
+        $lastApp = Application::where('user_id', $user->id)->where('status', '!=', 'archived')->latest()->first();
+
+        // Allow renewal if there's a for_renewal or completed application
+        // Block new/amendment if there's an active application
+        if ($lastApp && in_array($lastApp->status, ['for_renewal', 'completed', 'released']) === false) {
             return redirect()->route('driver.application')
                 ->with('error', 'You already have an active application. Please complete or cancel it before creating a new one.');
         }
 
-        return view('driver.application.create');
+        return view('driver.application.create', compact('lastApp'));
     }
 
     public function store(Request $request)
     {
         $user = $request->user();
-        if (Application::userHasActive($user->id)) {
+        $franchiseType = $request->input('franchise_type');
+
+        // For renewal applications, allow submission without archiving old ones yet
+        // For new and amendment, check for active applications
+        if ($franchiseType !== 'renewal' && Application::userHasActive($user->id)) {
             return redirect()->route('driver.application')
                 ->with('error', 'You already have an active application. Please complete or cancel it before creating a new one.');
         }
@@ -88,6 +97,21 @@ class ApplicationController extends Controller
         // Build full name from components
         $fullName = trim($validated['first_name'].' '.$validated['middle_name'].' '.$validated['last_name']);
 
+        // If this is a renewal, archive the previous application
+        if ($validated['franchise_type'] === 'renewal') {
+            $previousApp = Application::where('user_id', $user->id)
+                ->where('status', '!=', 'archived')
+                ->latest()
+                ->first();
+
+            if ($previousApp) {
+                $previousApp->update([
+                    'status' => 'archived',
+                    'archived_at' => now(),
+                ]);
+            }
+        }
+
         $application = Application::create([
             'user_id' => $user->id,
             'franchise_type' => $validated['franchise_type'],
@@ -118,6 +142,11 @@ class ApplicationController extends Controller
         // Handle document uploads if provided
         if ($request->hasFile('documents')) {
             $this->storeDocuments($application, $request);
+        }
+
+        // Send renewal notification if this is a renewal application
+        if ($validated['franchise_type'] === 'renewal') {
+            $user->notify(new RenewalSubmittedNotification($application));
         }
 
         return redirect()->route('driver.application.show', $application)
