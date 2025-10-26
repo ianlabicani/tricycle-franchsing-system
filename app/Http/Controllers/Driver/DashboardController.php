@@ -14,15 +14,20 @@ class DashboardController extends Controller
 
         // Get the latest/active application
         $activeApplication = Application::where('user_id', $user->id)
-            ->whereNotIn('status', ['rejected', 'completed'])
+            ->whereNotIn('status', ['rejected', 'completed', 'archived'])
             ->with(['latestInspection', 'latestPayment'])
             ->latest()
             ->first();
 
-        // Get the latest approved application
+        // Get the latest completed application
         $latestApprovedApplication = Application::where('user_id', $user->id)
-            ->whereIn('status', ['approved', 'released', 'completed'])
-            ->with(['latestInspection', 'latestPayment', 'approvedBy'])
+            ->where('status', 'completed')
+            ->with([
+                'latestInspection',
+                'latestPayment',
+                'approvedBy',
+                'documents',
+            ])
             ->latest()
             ->first();
 

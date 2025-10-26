@@ -25,7 +25,7 @@
         </div>
 
         <!-- Application Statistics -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <div class="flex items-center justify-between">
                     <div>
@@ -62,6 +62,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- Latest Completed Application (when no active) -->
+        @if($latestApprovedApplication)
     @else
         <!-- Application Progress Tracker -->
         @php
@@ -418,6 +421,7 @@
                 </div>
             </div>
         </div>
+        @endif
     @endif
 
 @endsection
