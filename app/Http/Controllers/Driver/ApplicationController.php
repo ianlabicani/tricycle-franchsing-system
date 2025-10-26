@@ -267,4 +267,60 @@ class ApplicationController extends Controller
             ]);
         }
     }
+
+    /**
+     * View a document (for images, display in browser)
+     */
+    public function viewDocument(Application $application, ApplicationDocument $document)
+    {
+        // Ensure the document belongs to this application
+        if ($document->application_id !== $application->id) {
+            abort(404);
+        }
+
+        // Authorize: user must own the application
+        $this->authorize('view', $application);
+
+        // Only allow viewing images
+        if (! $document->isImage()) {
+            return redirect()->route('driver.application.show', $application)
+                ->with('error', 'Cannot preview this file type.');
+        }
+
+        // Get file content
+        if (! Storage::disk('private')->exists($document->file_path)) {
+            abort(404, 'File not found');
+        }
+
+        return response()->file(
+            Storage::disk('private')->path($document->file_path),
+            ['Content-Type' => $document->mime_type]
+        );
+    }
+
+    /**
+     * Download a document
+     */
+    public function downloadDocument(Application $application, ApplicationDocument $document)
+    {
+        // Ensure the document belongs to this application
+        if ($document->application_id !== $application->id) {
+            abort(404);
+        }
+
+        // Authorize: user must own the application
+        $this->authorize('view', $application);
+
+        // Check if file exists
+        if (! Storage::disk('private')->exists($document->file_path)) {
+            abort(404, 'File not found');
+        }
+
+        // Return file download
+        return response()->download(
+            Storage::disk('private')->path($document->file_path),
+            $document->file_name,
+            ['Content-Type' => $document->mime_type]
+        );
+    }
 }

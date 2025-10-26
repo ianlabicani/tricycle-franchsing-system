@@ -207,10 +207,13 @@
                                                 {{ ucfirst($doc->status) }}
                                             </span>
                                             @if($doc->isImage())
-                                                <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
+                                                <a href="{{ route('driver.application.document.view', [$application, $doc]) }}" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-semibold" title="View image">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             @endif
+                                            <a href="{{ route('driver.application.document.download', [$application, $doc]) }}" class="text-green-600 hover:text-green-700 text-sm font-semibold" title="Download file">
+                                                <i class="fas fa-download"></i>
+                                            </a>
                                         </div>
                                     </div>
                                     @if($doc->status === 'rejected' && $doc->rejection_reason)
