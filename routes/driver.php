@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Driver\ApplicationController;
 use App\Http\Controllers\Driver\DashboardController;
+use App\Http\Controllers\Driver\InspectionController;
 use App\Http\Controllers\Driver\NotificationController;
 use App\Http\Controllers\Driver\PaymentController;
 use Illuminate\Support\Facades\Route;
@@ -11,9 +12,8 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Inspection Management
-    Route::get('/inspection', function () {
-        return view('driver.inspection');
-    })->name('inspection');
+    Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection');
+    Route::get('/inspections/{inspection}', [InspectionController::class, 'show'])->name('inspections.show');
 
     // Application Management
     Route::get('/application', [ApplicationController::class, 'index'])->name('application');

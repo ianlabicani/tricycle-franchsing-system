@@ -8,6 +8,74 @@
         <p class="text-gray-600 mt-2">Schedule and track your vehicle inspection appointments</p>
     </div>
 
+    <!-- All Inspections Summary -->
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">All Inspections</h2>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-100 border-b">
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Time</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Vehicle</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Result</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Inspector</th>
+                            <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $allInspections = collect([$inspection])->filter()->merge($inspectionHistory);
+                        @endphp
+                        @forelse($allInspections as $insp)
+                            <tr class="border-b hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $insp->scheduled_date->format('M d, Y') }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $insp->scheduled_time->format('h:i A') }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-800">
+                                    <span class="font-semibold">{{ $insp->application->plate_number ?? 'N/A' }}</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $insp->status === 'scheduled' ? 'bg-blue-100 text-blue-800' : ($insp->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">
+                                        {{ ucfirst($insp->status) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    @if($insp->status === 'completed')
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $insp->result === 'passed' ? 'bg-green-100 text-green-800' : ($insp->result === 'failed' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                                            <i class="fas {{ $insp->result === 'passed' ? 'fa-check-circle mr-1' : ($insp->result === 'failed' ? 'fa-times-circle mr-1' : '') }}"></i>
+                                            {{ ucfirst($insp->result ?? 'N/A') }}
+                                        </span>
+                                    @elseif($insp->status === 'cancelled')
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                                            <i class="fas fa-ban mr-1"></i>Cancelled
+                                        </span>
+                                    @else
+                                        <span class="text-gray-500">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $insp->inspector_name ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ route('driver.inspections.show', $insp) }}" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-xs font-semibold">
+                                        <i class="fas fa-eye mr-1"></i>View
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                                    <i class="fas fa-inbox text-3xl mb-2 block text-gray-300"></i>
+                                    No inspections yet
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     @if($inspection)
         <!-- Current Inspection Status -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-8 mb-8 text-white">
@@ -95,9 +163,9 @@
                     </div>
 
                     <div class="mt-6 flex space-x-3">
-                        <button class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-                            <i class="fas fa-directions mr-2"></i>Get Directions
-                        </button>
+                        <a href="{{ route('driver.inspections.show', $inspection) }}" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center">
+                            <i class="fas fa-eye mr-2"></i>View Details
+                        </a>
                         <button class="flex-1 bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition font-semibold">
                             <i class="fas fa-calendar-alt mr-2"></i>Reschedule
                         </button>
@@ -147,7 +215,7 @@
                     @if($inspectionHistory->count() > 0)
                         <div class="space-y-4">
                             @foreach($inspectionHistory as $pastInspection)
-                                <div class="flex items-start space-x-4 p-4 {{ $pastInspection->status === 'completed' && $pastInspection->result === 'passed' ? 'bg-green-50 border-l-4 border-green-500' : ($pastInspection->status === 'completed' && $pastInspection->result === 'failed' ? 'bg-red-50 border-l-4 border-red-500' : 'bg-gray-50 border-l-4 border-gray-400') }} rounded">
+                                <a href="{{ route('driver.inspections.show', $pastInspection) }}" class="flex items-start space-x-4 p-4 {{ $pastInspection->status === 'completed' && $pastInspection->result === 'passed' ? 'bg-green-50 border-l-4 border-green-500' : ($pastInspection->status === 'completed' && $pastInspection->result === 'failed' ? 'bg-red-50 border-l-4 border-red-500' : 'bg-gray-50 border-l-4 border-gray-400') }} rounded hover:shadow-md transition cursor-pointer">
                                     <i class="fas {{ $pastInspection->status === 'completed' && $pastInspection->result === 'passed' ? 'fa-check-circle text-green-600' : ($pastInspection->status === 'completed' && $pastInspection->result === 'failed' ? 'fa-times-circle text-red-600' : 'fa-ban text-gray-600') }} text-2xl mt-1"></i>
                                     <div class="flex-1">
                                         <div class="flex items-center justify-between mb-2">
@@ -161,7 +229,7 @@
                                             <p class="text-sm text-gray-500 mt-1">Remarks: {{ $pastInspection->remarks }}</p>
                                         @endif
                                     </div>
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                     @else
