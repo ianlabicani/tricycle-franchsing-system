@@ -41,10 +41,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Assign driver role to the new user
+        $user->assignRole('driver');
+
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('driver.dashboard', absolute: false));
     }
 }

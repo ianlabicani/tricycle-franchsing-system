@@ -60,4 +60,12 @@ class User extends Authenticatable
     {
         return $this->roles()->whereIn('name', $roles)->exists();
     }
+
+    public function assignRole($roleName)
+    {
+        $role = Role::where('name', $roleName)->first();
+        if ($role && ! $this->hasRole($roleName)) {
+            $this->roles()->attach($role);
+        }
+    }
 }
