@@ -81,10 +81,6 @@
                             <i class="fas fa-user text-blue-600"></i>
                             <span>My Profile</span>
                         </a>
-                        <a href="{{ route('driver.renewals') }}" class="px-4 py-2 text-gray-800 hover:bg-blue-50 transition flex items-center space-x-2">
-                            <i class="fas fa-sync-alt text-blue-600"></i>
-                            <span>Renewals</span>
-                        </a>
                         <a href="{{ route('driver.notifications') }}" class="px-4 py-2 text-gray-800 hover:bg-blue-50 transition flex items-center space-x-2">
                             <i class="fas fa-bell text-blue-600"></i>
                             <span>Notifications</span>

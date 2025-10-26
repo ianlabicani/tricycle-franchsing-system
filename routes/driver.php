@@ -40,11 +40,6 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
         return view('driver.profile');
     })->name('profile');
 
-    // Renewals
-    Route::get('/renewals', function () {
-        return view('driver.renewals');
-    })->name('renewals');
-
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
     Route::post('/notifications/{notification}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
