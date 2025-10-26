@@ -32,6 +32,7 @@
                         <a href="{{ route('sb.dashboard') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">Dashboard</a>
                     @endif
                     @else
+                        <a href="{{ route('register') }}" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-medium">Register</a>
                         <a href="{{ route('login') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium">Login</a>
                     @endauth
                 </div>
