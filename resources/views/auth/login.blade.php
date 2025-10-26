@@ -9,10 +9,10 @@
             <!-- Logo and Header -->
             <div class="text-center mb-8">
                 <a href="{{ url('/') }}" class="inline-block">
-                    <img src="{{ asset('images/logo.jpg') }}" alt="Agency Logo" class="h-20 w-20 mx-auto rounded-full object-cover shadow-lg">
+                    <img src="{{ asset('images/municipality-logo.jpg') }}" alt="Municipality Logo" class="h-20 w-20 mx-auto rounded-full object-cover shadow-lg">
                 </a>
                 <h2 class="mt-6 text-4xl font-bold text-gray-800">Welcome Back</h2>
-                <p class="mt-2 text-gray-600">Sign in to your account to continue</p>
+                <p class="mt-2 text-gray-600">Sign in to CTRIKE - Municipality of Lal-lo</p>
             </div>
 
             <!-- Login Card -->
@@ -84,16 +84,14 @@
                 </form>
 
                 <!-- Register Link -->
-                <!-- @if (Route::has('register'))
-                    <div class="mt-6 text-center">
-                        <p class="text-sm text-gray-600">
-                            Don't have an account?
-                            <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-800 font-medium transition">
-                                Register here
-                            </a>
-                        </p>
-                    </div>
-                @endif -->
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        Don't have an account?
+                        <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-800 font-medium transition">
+                            Register here
+                        </a>
+                    </p>
+                </div>
 
                 <!-- Divider -->
                 <div class="mt-6 relative">
@@ -117,7 +115,7 @@
 
             <!-- Footer Note -->
             <p class="mt-8 text-center text-sm text-gray-600">
-                Protected by AGENCY Name
+                CTRIKE - Municipality of Lal-lo
             </p>
         </div>
     </div>
