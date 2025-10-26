@@ -510,6 +510,12 @@
                                         @if($application->latestInspection->location)
                                             <p class="text-sm text-gray-600">Location: {{ $application->latestInspection->location }}</p>
                                         @endif
+                                        @if($application->latestInspection->notes)
+                                            <div class="mt-3 pt-3 border-t border-green-200">
+                                                <p class="text-xs font-semibold text-gray-700">Inspector Notes:</p>
+                                                <p class="text-sm text-gray-600 mt-1 italic">{{ $application->latestInspection->notes }}</p>
+                                            </div>
+                                        @endif
                                     @else
                                         <p class="text-sm text-gray-600 mt-1">Your vehicle inspection has been scheduled</p>
                                     @endif
@@ -570,6 +576,12 @@
                                             <p class="text-xs text-red-800"><strong>Issues:</strong> {{ $application->latestInspection->remarks }}</p>
                                         </div>
                                     @endif
+                                    @if($application->latestInspection && $application->latestInspection->notes)
+                                        <div class="mt-2 bg-yellow-50 border-l-4 border-yellow-500 p-2 rounded">
+                                            <p class="text-xs text-yellow-800"><strong>Inspector Notes:</strong></p>
+                                            <p class="text-xs text-yellow-700 mt-1">{{ $application->latestInspection->notes }}</p>
+                                        </div>
+                                    @endif
                                     @if($application->inspected_at)
                                         <p class="text-xs text-gray-500 mt-2">
                                             <i class="fas fa-clock mr-1"></i>
@@ -591,6 +603,12 @@
                                         </p>
                                         @if($application->latestInspection->inspector_name)
                                             <p class="text-sm text-gray-600">Inspector: {{ $application->latestInspection->inspector_name }}</p>
+                                        @endif
+                                        @if($application->latestInspection->notes)
+                                            <div class="mt-3 bg-green-100 border-l-4 border-green-600 p-3 rounded">
+                                                <p class="text-xs text-green-800"><strong>Inspector Notes:</strong></p>
+                                                <p class="text-xs text-green-700 mt-1">{{ $application->latestInspection->notes }}</p>
+                                            </div>
                                         @endif
                                     @else
                                         <p class="text-sm text-gray-600 mt-1">Your vehicle passed the inspection</p>
