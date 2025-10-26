@@ -350,4 +350,116 @@ class ApplicationController extends Controller
             ['Content-Type' => $document->mime_type]
         );
     }
+
+    /**
+     * Re-upload a rejected document
+     */
+    public function reuploadDocument(Request $request, Application $application)
+    {
+        // Authorize: user must own the application
+        $this->authorize('update', $application);
+
+        // Validate request
+        $validated = $request->validate([
+            'document_id' => 'required|integer|exists:application_documents,id',
+            'document_type' => 'required|string|in:id_picture,cedula,lto_certificate,lto_receipt,engine_stencil,chassis_stencil,tricycle_front,tricycle_side,tricycle_back',
+            'file' => 'required|file',
+        ]);
+
+        // Get the document to be replaced
+        $oldDocument = ApplicationDocument::find($validated['document_id']);
+
+        // Verify the document belongs to this application
+        if ($oldDocument->application_id !== $application->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Document does not belong to this application',
+            ], 403);
+        }
+
+        // Verify the document is rejected
+        if ($oldDocument->status !== 'rejected') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only rejected documents can be re-uploaded',
+            ], 422);
+        }
+
+        $file = $request->file('file');
+        $documentType = $validated['document_type'];
+
+        // Validate file type
+        $allowedMimes = self::DOCUMENT_TYPES[$documentType];
+        if (! in_array($file->getMimeType(), $allowedMimes)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid file type for this document',
+            ], 422);
+        }
+
+        // Validate file size
+        $maxSize = in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/webp'])
+            ? self::MAX_IMAGE_SIZE
+            : self::MAX_FILE_SIZE;
+
+        if ($file->getSize() > $maxSize) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File size exceeds maximum allowed',
+            ], 422);
+        }
+
+        try {
+            // Delete old file if it exists
+            if (Storage::disk('private')->exists($oldDocument->file_path)) {
+                Storage::disk('private')->delete($oldDocument->file_path);
+            }
+
+            // Store new file
+            $storagePath = "applications/{$application->id}/{$documentType}";
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs($storagePath, $fileName, 'private');
+
+            if ($filePath) {
+                // Update the document record (reset to pending for review)
+                $oldDocument->update([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $filePath,
+                    'mime_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                    'status' => 'pending',
+                    'rejection_reason' => null,
+                    'reviewed_by' => null,
+                    'reviewed_at' => null,
+                ]);
+
+                // Also reset application status to pending_review if it was incomplete
+                if ($application->status === 'incomplete') {
+                    $application->update([
+                        'status' => 'pending_review',
+                        'date_submitted' => now(),
+                    ]);
+                }
+
+                \Log::info("Document re-uploaded successfully: {$documentType} for application {$application->id}");
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Document re-uploaded successfully',
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to store file',
+            ], 500);
+        } catch (\Exception $e) {
+            \Log::error("Error re-uploading document {$documentType}: {$e->getMessage()}");
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error uploading file: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

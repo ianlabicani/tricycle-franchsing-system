@@ -220,6 +220,11 @@
                                             <a href="{{ route('driver.application.document.download', [$application, $doc]) }}" class="text-green-600 hover:text-green-700 text-sm font-semibold" title="Download file">
                                                 <i class="fas fa-download"></i>
                                             </a>
+                                            @if($doc->status === 'rejected' && in_array($application->status, ['incomplete', 'pending_review']))
+                                                <button type="button" onclick="openReuploadModal({{ $doc->id }}, '{{ $doc->document_type }}')" class="text-orange-600 hover:text-orange-700 text-sm font-semibold" title="Re-upload document">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                            @endif
                                         </div>
                                     </div>
                                     @if($doc->status === 'rejected' && $doc->rejection_reason)
@@ -231,6 +236,104 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+            </div>
+
+            <!-- Re-upload Modal -->
+            <div id="reuploadModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4" style="display: none;">
+                <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Re-upload Document</h3>
+                            <button type="button" onclick="closeReuploadModal()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+
+                        <form id="reuploadForm" enctype="multipart/form-data" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" id="documentId" name="document_id">
+                            <input type="hidden" id="documentType" name="document_type">
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select New File</label>
+                                <div class="border-2 border-dashed border-orange-300 rounded-lg p-4 text-center hover:border-orange-500 hover:bg-orange-50 transition cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                                    <input type="file" id="fileInput" name="file" accept="image/*,.pdf" class="hidden" onchange="updateFileName(this)">
+                                    <i class="fas fa-cloud-upload-alt text-orange-400 text-3xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="fileName">Click to select or drag and drop</p>
+                                    <p class="text-xs text-gray-500 mt-1">JPG, PNG, WebP, or PDF</p>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-gray-600 bg-blue-50 p-3 rounded">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                <strong>Tip:</strong> Make sure the new file addresses the rejection reason provided by the reviewer.
+                            </p>
+                        </form>
+                    </div>
+
+                    <div class="bg-gray-50 px-6 py-4 rounded-b-xl flex items-center justify-end space-x-3">
+                        <button type="button" onclick="closeReuploadModal()" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition font-semibold text-sm">
+                            Cancel
+                        </button>
+                        <button type="button" onclick="submitReupload()" class="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition font-semibold text-sm">
+                            <i class="fas fa-upload mr-1"></i>Re-upload
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Modal -->
+            <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4" style="display: none;">
+                <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+                    <div class="p-6 text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle text-green-500 text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Success!</h3>
+                        <p class="text-gray-600 mb-6">Document re-uploaded successfully! It will be reviewed shortly.</p>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-4 rounded-b-xl">
+                        <button type="button" onclick="confirmSuccess()" class="w-full px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition font-semibold">
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Modal -->
+            <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4" style="display: none;">
+                <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+                    <div class="p-6 text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-exclamation-circle text-red-500 text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Error</h3>
+                        <p class="text-gray-600 mb-6" id="errorMessage">An error occurred. Please try again.</p>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-4 rounded-b-xl">
+                        <button type="button" onclick="closeErrorModal()" class="w-full px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition font-semibold">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validation Modal -->
+            <div id="validationModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4" style="display: none;">
+                <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+                    <div class="p-6 text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-info-circle text-yellow-500 text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Validation Required</h3>
+                        <p class="text-gray-600 mb-6" id="validationMessage">Please select a file to upload.</p>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-4 rounded-b-xl">
+                        <button type="button" onclick="closeValidationModal()" class="w-full px-4 py-2 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 transition font-semibold">
+                            OK
+                        </button>
+                    </div>
                 </div>
             </div>
             @endif
@@ -767,5 +870,147 @@
 
         </div>
     </div>
+
+    <script>
+        // Re-upload modal functions
+        function openReuploadModal(documentId, documentType) {
+            document.getElementById('documentId').value = documentId;
+            document.getElementById('documentType').value = documentType;
+            document.getElementById('fileName').textContent = 'Click to select or drag and drop';
+            document.getElementById('fileInput').value = '';
+            const modal = document.getElementById('reuploadModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReuploadModal() {
+            const modal = document.getElementById('reuploadModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateFileName(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('fileName').textContent = input.files[0].name;
+            }
+        }
+
+        function showValidationModal(message) {
+            document.getElementById('validationMessage').textContent = message;
+            document.getElementById('validationModal').style.display = 'flex';
+        }
+
+        function closeValidationModal() {
+            document.getElementById('validationModal').style.display = 'none';
+        }
+
+        function showErrorModal(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').style.display = 'flex';
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').style.display = 'none';
+        }
+
+        function showSuccessModal() {
+            document.getElementById('successModal').style.display = 'flex';
+        }
+
+        function confirmSuccess() {
+            document.getElementById('successModal').style.display = 'none';
+            location.reload();
+        }
+
+        function submitReupload() {
+            const fileInput = document.getElementById('fileInput');
+            const documentId = document.getElementById('documentId').value;
+            const documentType = document.getElementById('documentType').value;
+
+            if (!fileInput.files || !fileInput.files[0]) {
+                showValidationModal('Please select a file to upload');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+            formData.append('document_id', documentId);
+            formData.append('document_type', documentType);
+            formData.append('file', fileInput.files[0]);
+
+            const appId = {{ $application->id }};
+
+            fetch(`/driver/applications/${appId}/documents/reupload`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Upload failed');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    closeReuploadModal();
+                    showSuccessModal();
+                } else {
+                    showErrorModal(data.message || 'Upload failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorModal('Error uploading file: ' + error.message);
+            });
+        }
+
+        // Close modals when clicking outside
+        document.getElementById('reuploadModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReuploadModal();
+            }
+        });
+
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                confirmSuccess();
+            }
+        });
+
+        document.getElementById('errorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeErrorModal();
+            }
+        });
+
+        document.getElementById('validationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeValidationModal();
+            }
+        });
+
+        // Drag and drop support
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = fileInput.parentElement;
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-orange-500', 'bg-orange-50');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-orange-500', 'bg-orange-50');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-orange-500', 'bg-orange-50');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileName(fileInput);
+            }
+        });
+    </script>
 
 @endsection

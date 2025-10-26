@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
     Route::delete('/application/{application}', [ApplicationController::class, 'destroy'])->name('application.destroy');
     Route::get('/application/{application}/document/{document}/view', [ApplicationController::class, 'viewDocument'])->name('application.document.view');
     Route::get('/application/{application}/document/{document}/download', [ApplicationController::class, 'downloadDocument'])->name('application.document.download');
+    Route::post('/applications/{application}/documents/reupload', [ApplicationController::class, 'reuploadDocument'])->name('application.document.reupload');
 
     // Payments
     Route::get('/payments', function () {
