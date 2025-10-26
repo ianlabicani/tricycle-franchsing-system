@@ -296,6 +296,29 @@
             };
             documentCard.className = 'flex items-start justify-between p-4 border rounded-lg ' + (statusColors[newStatus] || 'bg-gray-50 border-gray-200');
         }
+
+        // Check if all documents are now approved
+        checkAndHideWarningBanner();
+    }
+
+    function checkAndHideWarningBanner() {
+        const allDocuments = document.querySelectorAll('[data-document-id]');
+
+        // Check if all documents are approved
+        const allApproved = Array.from(allDocuments).every(doc => {
+            const badge = doc.querySelector('span[class*="rounded-full"]');
+            return badge && badge.textContent.trim() === 'Approved';
+        });
+
+        if (allApproved && allDocuments.length > 0) {
+            // Hide the warning banner by looking for the red banner with exclamation icon
+            const warningBanners = document.querySelectorAll('.bg-red-50');
+            warningBanners.forEach(banner => {
+                if (banner.querySelector('.fa-exclamation-circle')) {
+                    banner.style.display = 'none';
+                }
+            });
+        }
     }
 
     function showNotification(message, type = 'info') {

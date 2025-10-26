@@ -213,6 +213,9 @@ class ApplicationController extends Controller
     {
         // Verify the document belongs to this application
         if ($document->application_id !== $application->id) {
+            if (request()->wantsJson()) {
+                return response()->json(['error' => 'Document not found for this application.'], 404);
+            }
             return redirect()->route('sb.applications.show', $application)
                 ->with('error', 'Document not found for this application.');
         }
@@ -222,6 +225,10 @@ class ApplicationController extends Controller
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
         ]);
+
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => ucfirst($document->document_label).' approved successfully.']);
+        }
 
         return redirect()->route('sb.applications.show', $application)
             ->with('success', ucfirst($document->document_label).' approved successfully.');
@@ -238,6 +245,9 @@ class ApplicationController extends Controller
 
         // Verify the document belongs to this application
         if ($document->application_id !== $application->id) {
+            if (request()->wantsJson()) {
+                return response()->json(['error' => 'Document not found for this application.'], 404);
+            }
             return redirect()->route('sb.applications.show', $application)
                 ->with('error', 'Document not found for this application.');
         }
@@ -248,6 +258,10 @@ class ApplicationController extends Controller
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
         ]);
+
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => ucfirst($document->document_label).' rejected. Driver will be notified.']);
+        }
 
         return redirect()->route('sb.applications.show', $application)
             ->with('success', ucfirst($document->document_label).' rejected. Driver will be notified.');
