@@ -13,15 +13,8 @@
 
     <!-- Page Header -->
     <div class="mb-8">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Payment Management</h1>
-                <p class="text-gray-600 mt-2">Manage and verify franchise payments</p>
-            </div>
-            <a href="{{ route('sb.payments.create') }}" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold shadow-lg">
-                <i class="fas fa-plus mr-2"></i>Create Payment Record
-            </a>
-        </div>
+        <h1 class="text-3xl font-bold text-gray-800">Payment Management</h1>
+        <p class="text-gray-600 mt-2">Manage and verify franchise payments</p>
     </div>
 
     @if(session('success'))
