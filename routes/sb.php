@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::post('/applications/{application}/review', [ApplicationController::class, 'review'])->name('applications.review');
     Route::post('/applications/{application}/release', [ApplicationController::class, 'release'])->name('applications.release');
     Route::post('/applications/{application}/complete', [ApplicationController::class, 'complete'])->name('applications.complete');
+    Route::post('/applications/{application}/test-renewal', [ApplicationController::class, 'testRenewal'])->name('applications.testRenewal');
 
     // Document Management
     Route::post('/applications/{application}/documents/{document}/approve', [ApplicationController::class, 'approveDocument'])->name('documents.approve');
@@ -46,4 +47,3 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::post('/inspections/{inspection}/complete', [InspectionController::class, 'complete'])->name('inspections.complete');
     Route::post('/inspections/{inspection}/cancel', [InspectionController::class, 'cancel'])->name('inspections.cancel');
 });
-

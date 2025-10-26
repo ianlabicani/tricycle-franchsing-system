@@ -18,11 +18,20 @@ class SendRenewalNotifications extends Command
         $now = now();
         $oneMonthFromNow = $now->copy()->addMonth()->startOfDay();
 
-        // 1. Send in-app notification 1 month before expiration
+        $this->info("Current time: {$now}");
+        $this->info("One month from now: {$oneMonthFromNow}");
+
+        // 1. Send in-app notification 1 month before expiration (or within renewal window)
+        // Only send to those who haven't been notified yet
         $appsForReminder = Application::whereNotNull('expiration_date')
             ->whereNull('renewal_reminder_sent_at')
-            ->whereDate('expiration_date', $oneMonthFromNow)
+            ->where('status', '!=', 'archived')
+            ->where('status', '!=', 'for_renewal')
+            ->whereDate('expiration_date', '<=', $oneMonthFromNow)
+            ->whereDate('expiration_date', '>', $now)
             ->get();
+
+        $this->info('Found '.$appsForReminder->count().' apps for reminder notification');
 
         foreach ($appsForReminder as $app) {
             $user = $app->user;
@@ -34,16 +43,24 @@ class SendRenewalNotifications extends Command
             }
         }
 
-        // 2. Set status to 'for_renewal' if expired
-        $expiredApps = Application::whereNotNull('expiration_date')
+        // 2. Set status to 'for_renewal' for ALL applications within renewal window (regardless of reminder status)
+        $renewalApps = Application::whereNotNull('expiration_date')
             ->where('status', '!=', 'for_renewal')
-            ->whereDate('expiration_date', '<=', $now)
+            ->where('status', '!=', 'archived')
+            ->where('status', '!=', 'rejected')
+            ->where(function ($query) use ($now, $oneMonthFromNow) {
+                $query->whereDate('expiration_date', '<=', $oneMonthFromNow)
+                    ->whereDate('expiration_date', '>=', $now);
+            })
             ->get();
 
-        foreach ($expiredApps as $app) {
+        $this->info('Found '.$renewalApps->count().' apps for renewal status update');
+
+        foreach ($renewalApps as $app) {
+            $oldStatus = $app->status;
             $app->status = 'for_renewal';
             $app->save();
-            $this->info("Set application #{$app->id} status to for_renewal");
+            $this->info("Set application #{$app->id} status from '{$oldStatus}' to 'for_renewal' (expiry: {$app->expiration_date})");
         }
 
         $this->info('Renewal notification and status update process complete.');

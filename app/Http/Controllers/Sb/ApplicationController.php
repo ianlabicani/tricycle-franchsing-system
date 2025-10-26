@@ -158,6 +158,29 @@ class ApplicationController extends Controller
             ->with('success', 'Application rejected.');
     }
 
+    public function testRenewal(Application $application)
+    {
+        // Only for completed applications
+        if ($application->status !== 'completed') {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Only completed applications can be tested for renewal.');
+        }
+
+        // Update expiration date to within the renewal window (within 1 month from now)
+        $application->update([
+            'expiration_date' => now()->addDays(15), // 15 days from now, which is within the 1-month renewal window
+        ]);
+
+        // Trigger the renewal check command immediately
+        \Artisan::call('applications:send-renewal-notifications');
+
+        // Refresh the application to get the updated status
+        $application->refresh();
+
+        return redirect()->route('sb.applications.show', $application)
+            ->with('success', 'Test renewal triggered! Renewal check command executed. Application status updated to: ' . ucfirst(str_replace('_', ' ', $application->status)));
+    }
+
     public function review(Request $request, Application $application)
     {
         $request->validate([
@@ -216,6 +239,7 @@ class ApplicationController extends Controller
             if (request()->wantsJson()) {
                 return response()->json(['error' => 'Document not found for this application.'], 404);
             }
+
             return redirect()->route('sb.applications.show', $application)
                 ->with('error', 'Document not found for this application.');
         }
@@ -248,6 +272,7 @@ class ApplicationController extends Controller
             if (request()->wantsJson()) {
                 return response()->json(['error' => 'Document not found for this application.'], 404);
             }
+
             return redirect()->route('sb.applications.show', $application)
                 ->with('error', 'Document not found for this application.');
         }

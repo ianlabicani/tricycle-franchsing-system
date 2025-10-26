@@ -219,6 +219,21 @@
                         <span class="font-bold text-green-600">5/5 Complete</span>
                     </div>
                 </div>
+
+                @if($application->status === 'completed')
+                <div class="mt-4 pt-4 border-t">
+                    <form action="{{ route('sb.applications.testRenewal', $application) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="w-full bg-amber-600 text-white py-2 rounded-lg hover:bg-amber-700 transition font-semibold text-sm">
+                            <i class="fas fa-flask mr-2"></i>Test Renewal Process
+                        </button>
+                    </form>
+                    <p class="text-xs text-amber-700 mt-2 bg-amber-50 p-2 rounded">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Updates expiry to 1 month before actual expiration to trigger renewal logic.
+                    </p>
+                </div>
+                @endif
             </div>
 
             <!-- Contact Driver -->
