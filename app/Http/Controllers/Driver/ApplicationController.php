@@ -4,12 +4,30 @@ namespace App\Http\Controllers\Driver;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\ApplicationDocument;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
 {
     use AuthorizesRequests;
+
+    // Document type validation rules
+    private const DOCUMENT_TYPES = [
+        'id_picture' => ['image/jpeg', 'image/png', 'image/webp'],
+        'cedula' => ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+        'lto_certificate' => ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+        'lto_receipt' => ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+        'engine_stencil' => ['image/jpeg', 'image/png', 'image/webp'],
+        'chassis_stencil' => ['image/jpeg', 'image/png', 'image/webp'],
+        'tricycle_front' => ['image/jpeg', 'image/png', 'image/webp'],
+        'tricycle_side' => ['image/jpeg', 'image/png', 'image/webp'],
+        'tricycle_back' => ['image/jpeg', 'image/png', 'image/webp'],
+    ];
+
+    private const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+    private const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB for images
 
     public function index(Request $request)
     {
@@ -51,6 +69,9 @@ class ApplicationController extends Controller
             'operating_hours' => 'required|string|max:100',
             // Additional
             'purpose' => 'nullable|string|max:1000',
+            // Documents
+            'documents' => 'nullable|array',
+            'documents.*' => 'nullable|file',
         ]);
 
         // Build full name from components
@@ -83,13 +104,18 @@ class ApplicationController extends Controller
             'date_submitted' => now(),
         ]);
 
+        // Handle document uploads if provided
+        if ($request->has('documents') && is_array($request->input('documents'))) {
+            $this->storeDocuments($application, $request);
+        }
+
         return redirect()->route('driver.application.show', $application)
             ->with('success', 'Application submitted successfully! Your application number is: '.$application->application_no);
     }
 
     public function show(Application $application)
     {
-        $application->load('latestPayment', 'latestInspection');
+        $application->load('latestPayment', 'latestInspection', 'documents');
 
         return view('driver.application.show', compact('application'));
     }
@@ -138,6 +164,9 @@ class ApplicationController extends Controller
             'operating_hours' => 'required|string|max:100',
             // Additional
             'purpose' => 'nullable|string|max:1000',
+            // Documents
+            'documents' => 'nullable|array',
+            'documents.*' => 'nullable|file',
         ]);
 
         // Build full name from components
@@ -162,6 +191,11 @@ class ApplicationController extends Controller
             'operating_hours' => $validated['operating_hours'],
             'purpose' => $validated['purpose'],
         ]);
+
+        // Handle document uploads if provided
+        if ($request->has('documents') && is_array($request->input('documents'))) {
+            $this->storeDocuments($application, $request);
+        }
 
         // If status was incomplete, change to pending_review upon resubmission
         if ($application->status === 'incomplete') {
@@ -189,5 +223,48 @@ class ApplicationController extends Controller
 
         return redirect()->route('driver.application')
             ->with('success', 'Application deleted successfully.');
+    }
+
+    /**
+     * Store uploaded documents for an application
+     */
+    private function storeDocuments(Application $application, Request $request)
+    {
+        foreach ($request->file('documents', []) as $documentType => $file) {
+            if (! $file || ! isset(self::DOCUMENT_TYPES[$documentType])) {
+                continue;
+            }
+
+            // Validate file type
+            $allowedMimes = self::DOCUMENT_TYPES[$documentType];
+            if (! in_array($file->getMimeType(), $allowedMimes)) {
+                continue;
+            }
+
+            // Validate file size
+            $maxSize = in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'image/webp'])
+                ? self::MAX_IMAGE_SIZE
+                : self::MAX_FILE_SIZE;
+
+            if ($file->getSize() > $maxSize) {
+                continue;
+            }
+
+            // Store the file
+            $storagePath = "applications/{$application->id}/{$documentType}";
+            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+            $filePath = $file->storeAs($storagePath, $fileName, 'private');
+
+            // Create document record
+            ApplicationDocument::create([
+                'application_id' => $application->id,
+                'document_type' => $documentType,
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $filePath,
+                'mime_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+                'status' => 'pending',
+            ]);
+        }
     }
 }

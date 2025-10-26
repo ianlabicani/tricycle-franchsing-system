@@ -149,6 +149,38 @@ class Application extends Model
     }
 
     /**
+     * Get the documents for the application.
+     */
+    public function documents()
+    {
+        return $this->hasMany(ApplicationDocument::class);
+    }
+
+    /**
+     * Get pending documents for the application.
+     */
+    public function pendingDocuments()
+    {
+        return $this->documents()->where('status', 'pending');
+    }
+
+    /**
+     * Get approved documents for the application.
+     */
+    public function approvedDocuments()
+    {
+        return $this->documents()->where('status', 'approved');
+    }
+
+    /**
+     * Get rejected documents for the application.
+     */
+    public function rejectedDocuments()
+    {
+        return $this->documents()->where('status', 'rejected');
+    }
+
+    /**
      * Check if application is renewable (expiring soon or expired).
      */
     public function isRenewable(): bool

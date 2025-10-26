@@ -32,7 +32,7 @@
         <div class="lg:col-span-2">
 
             <!-- Application Form -->
-            <form action="{{ route('driver.application.store') }}" method="POST" class="bg-white rounded-xl shadow-lg p-6">
+            <form action="{{ route('driver.application.store') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow-lg p-6">
                 @csrf
 
                 <!-- Franchise Type -->
@@ -216,6 +216,148 @@
                     </div>
                 </div>
 
+                <!-- Required Documents -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b">Required Documents <span class="text-red-500">*</span></h2>
+                    <p class="text-sm text-gray-600 mb-4">Please upload all required documents. You can upload them now or after submitting your application.</p>
+
+                    <!-- Personal Documents -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-id-card text-blue-500 mr-2"></i>
+                            Personal Documents
+                        </h3>
+                        <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+                            <!-- 2x2 ID Picture -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">2x2 ID Picture <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('id_picture').click()">
+                                    <input type="file" id="id_picture" name="documents[id_picture]" accept="image/jpeg,image/png" class="hidden" onchange="updateFileName(this, 'id_picture_name')">
+                                    <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="id_picture_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG or PNG, Max 5MB</p>
+                                </div>
+                            </div>
+
+                            <!-- Cedula -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cedula of Owner/Operator <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('cedula').click()">
+                                    <input type="file" id="cedula" name="documents[cedula]" accept="image/jpeg,image/png,application/pdf" class="hidden" onchange="updateFileName(this, 'cedula_name')">
+                                    <i class="fas fa-id-card text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="cedula_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG, PNG, or PDF, Max 10MB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LTO Documents -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                            LTO Documents
+                        </h3>
+                        <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+                            <!-- LTO Certificate -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">LTO Certificate of Registration <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('lto_certificate').click()">
+                                    <input type="file" id="lto_certificate" name="documents[lto_certificate]" accept="image/jpeg,image/png,application/pdf" class="hidden" onchange="updateFileName(this, 'lto_certificate_name')">
+                                    <i class="fas fa-file-pdf text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="lto_certificate_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG, PNG, or PDF, Max 10MB</p>
+                                </div>
+                            </div>
+
+                            <!-- LTO Receipt -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">LTO Official Receipt <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('lto_receipt').click()">
+                                    <input type="file" id="lto_receipt" name="documents[lto_receipt]" accept="image/jpeg,image/png,application/pdf" class="hidden" onchange="updateFileName(this, 'lto_receipt_name')">
+                                    <i class="fas fa-file-pdf text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="lto_receipt_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG, PNG, or PDF, Max 10MB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Identification Numbers -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-stamp text-yellow-600 mr-2"></i>
+                            Vehicle Identification Numbers
+                        </h3>
+                        <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+                            <!-- Engine Stencil -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Engine Number Stencil <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('engine_stencil').click()">
+                                    <input type="file" id="engine_stencil" name="documents[engine_stencil]" accept="image/jpeg,image/png" class="hidden" onchange="updateFileName(this, 'engine_stencil_name')">
+                                    <i class="fas fa-stamp text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="engine_stencil_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG or PNG, Max 5MB</p>
+                                </div>
+                            </div>
+
+                            <!-- Chassis Stencil -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Chassis Number Stencil <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('chassis_stencil').click()">
+                                    <input type="file" id="chassis_stencil" name="documents[chassis_stencil]" accept="image/jpeg,image/png" class="hidden" onchange="updateFileName(this, 'chassis_stencil_name')">
+                                    <i class="fas fa-stamp text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="chassis_stencil_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG or PNG, Max 5MB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tricycle Photos -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-image text-green-600 mr-2"></i>
+                            Tricycle Photos
+                        </h3>
+                        <p class="text-xs text-gray-500 mb-3">Photos should clearly show the tricycle's line color markings</p>
+                        <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+                            <!-- Tricycle Front -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tricycle Photo (Front) <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('tricycle_front').click()">
+                                    <input type="file" id="tricycle_front" name="documents[tricycle_front]" accept="image/jpeg,image/png" class="hidden" onchange="updateFileName(this, 'tricycle_front_name')">
+                                    <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="tricycle_front_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG or PNG, Max 5MB</p>
+                                </div>
+                            </div>
+
+                            <!-- Tricycle Side -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tricycle Photo (Side) <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('tricycle_side').click()">
+                                    <input type="file" id="tricycle_side" name="documents[tricycle_side]" accept="image/jpeg,image/png" class="hidden" onchange="updateFileName(this, 'tricycle_side_name')">
+                                    <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="tricycle_side_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG or PNG, Max 5MB</p>
+                                </div>
+                            </div>
+
+                            <!-- Tricycle Back -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tricycle Photo (Back) <span class="text-red-500">*</span></label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer" onclick="document.getElementById('tricycle_back').click()">
+                                    <input type="file" id="tricycle_back" name="documents[tricycle_back]" accept="image/jpeg,image/png" class="hidden" onchange="updateFileName(this, 'tricycle_back_name')">
+                                    <i class="fas fa-image text-gray-400 text-2xl mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-600" id="tricycle_back_name">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-gray-500">JPG or PNG, Max 5MB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Form Actions -->
                 <div class="flex items-center justify-between pt-6 border-t">
                     <a href="{{ route('driver.application') }}" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-semibold">
@@ -297,5 +439,68 @@
 
         </div>
     </div>
+
+    <script>
+        function updateFileName(input, displayId) {
+            const fileName = input.files.length > 0 ? input.files[0].name : 'Click to upload or drag and drop';
+            const fileSizeKB = input.files.length > 0 ? (input.files[0].size / 1024).toFixed(2) : '';
+            const displayText = input.files.length > 0
+                ? `✓ ${fileName} (${fileSizeKB} KB)`
+                : 'Click to upload or drag and drop';
+
+            document.getElementById(displayId).textContent = displayText;
+
+            // Update the parent styling to show file is selected
+            const parent = input.closest('.border-2');
+            if (input.files.length > 0) {
+                parent.classList.add('border-green-500', 'bg-green-50');
+                parent.classList.remove('border-gray-300', 'hover:border-blue-500', 'hover:bg-blue-50');
+            } else {
+                parent.classList.remove('border-green-500', 'bg-green-50');
+                parent.classList.add('border-gray-300', 'hover:border-blue-500', 'hover:bg-blue-50');
+            }
+        }
+
+        // Drag and drop functionality
+        document.querySelectorAll('.border-2.border-dashed').forEach(zone => {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                zone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                zone.classList.add('border-blue-500', 'bg-blue-50');
+            }
+
+            function unhighlight(e) {
+                zone.classList.remove('border-blue-500', 'bg-blue-50');
+            }
+
+            zone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                const input = zone.querySelector('input[type="file"]');
+                input.files = files;
+
+                // Trigger the onchange event
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        });
+    </script>
 
 @endsection
