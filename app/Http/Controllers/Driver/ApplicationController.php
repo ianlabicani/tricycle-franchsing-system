@@ -27,6 +27,7 @@ class ApplicationController extends Controller
     ];
 
     private const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
     private const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB for images
 
     public function index(Request $request)
@@ -75,7 +76,7 @@ class ApplicationController extends Controller
         ]);
 
         // Build full name from components
-        $fullName = trim($validated['first_name'] . ' ' . $validated['middle_name'] . ' ' . $validated['last_name']);
+        $fullName = trim($validated['first_name'].' '.$validated['middle_name'].' '.$validated['last_name']);
 
         $application = Application::create([
             'user_id' => $user->id,
@@ -105,7 +106,7 @@ class ApplicationController extends Controller
         ]);
 
         // Handle document uploads if provided
-        if ($request->has('documents') && is_array($request->input('documents'))) {
+        if ($request->hasFile('documents')) {
             $this->storeDocuments($application, $request);
         }
 
@@ -170,7 +171,7 @@ class ApplicationController extends Controller
         ]);
 
         // Build full name from components
-        $fullName = trim($validated['first_name'] . ' ' . $validated['middle_name'] . ' ' . $validated['last_name']);
+        $fullName = trim($validated['first_name'].' '.$validated['middle_name'].' '.$validated['last_name']);
 
         $application->update([
             'franchise_type' => $validated['franchise_type'],
@@ -193,7 +194,7 @@ class ApplicationController extends Controller
         ]);
 
         // Handle document uploads if provided
-        if ($request->has('documents') && is_array($request->input('documents'))) {
+        if ($request->hasFile('documents')) {
             $this->storeDocuments($application, $request);
         }
 
@@ -230,7 +231,10 @@ class ApplicationController extends Controller
      */
     private function storeDocuments(Application $application, Request $request)
     {
-        foreach ($request->file('documents', []) as $documentType => $file) {
+        $documents = $request->file('documents') ?? [];
+
+        foreach ($documents as $documentType => $file) {
+            // Skip if no file or invalid document type
             if (! $file || ! isset(self::DOCUMENT_TYPES[$documentType])) {
                 continue;
             }
@@ -238,6 +242,8 @@ class ApplicationController extends Controller
             // Validate file type
             $allowedMimes = self::DOCUMENT_TYPES[$documentType];
             if (! in_array($file->getMimeType(), $allowedMimes)) {
+                \Log::warning("Invalid MIME type for {$documentType}: {$file->getMimeType()}");
+
                 continue;
             }
 
@@ -247,24 +253,35 @@ class ApplicationController extends Controller
                 : self::MAX_FILE_SIZE;
 
             if ($file->getSize() > $maxSize) {
+                \Log::warning("File too large for {$documentType}: {$file->getSize()}");
+
                 continue;
             }
 
             // Store the file
             $storagePath = "applications/{$application->id}/{$documentType}";
-            $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-            $filePath = $file->storeAs($storagePath, $fileName, 'private');
+            $fileName = time().'_'.str_replace(' ', '_', $file->getClientOriginalName());
 
-            // Create document record
-            ApplicationDocument::create([
-                'application_id' => $application->id,
-                'document_type' => $documentType,
-                'file_name' => $file->getClientOriginalName(),
-                'file_path' => $filePath,
-                'mime_type' => $file->getMimeType(),
-                'file_size' => $file->getSize(),
-                'status' => 'pending',
-            ]);
+            try {
+                $filePath = $file->storeAs($storagePath, $fileName, 'private');
+
+                if ($filePath) {
+                    // Create document record
+                    ApplicationDocument::create([
+                        'application_id' => $application->id,
+                        'document_type' => $documentType,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_path' => $filePath,
+                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $file->getSize(),
+                        'status' => 'pending',
+                    ]);
+
+                    \Log::info("Document stored successfully: {$documentType} for application {$application->id}");
+                }
+            } catch (\Exception $e) {
+                \Log::error("Error storing document {$documentType}: {$e->getMessage()}");
+            }
         }
     }
 
