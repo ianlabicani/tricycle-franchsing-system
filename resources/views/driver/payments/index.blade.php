@@ -109,24 +109,31 @@
                 @if($payments && count($payments) > 0)
                     <div class="space-y-3">
                         @foreach($payments as $payment)
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center
-                                        {{ $payment->status === 'paid' ? 'bg-green-100' : ($payment->status === 'cancelled' ? 'bg-red-100' : 'bg-yellow-100') }}">
-                                        <i class="fas {{ $payment->status === 'paid' ? 'fa-check text-green-600' : ($payment->status === 'cancelled' ? 'fa-times text-red-600' : 'fa-clock text-yellow-600') }}"></i>
+                            <a href="{{ route('driver.payments.show', $payment) }}" class="block">
+                                <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition cursor-pointer hover:shadow-md">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center
+                                            {{ $payment->status === 'paid' ? 'bg-green-100' : ($payment->status === 'cancelled' ? 'bg-red-100' : 'bg-yellow-100') }}">
+                                            <i class="fas {{ $payment->status === 'paid' ? 'fa-check text-green-600' : ($payment->status === 'cancelled' ? 'fa-times text-red-600' : 'fa-clock text-yellow-600') }}"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-800">{{ $payment->payment_no }}</p>
+                                            <p class="text-sm text-gray-500">{{ $payment->created_at->format('M d, Y') }}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-800">{{ $payment->payment_no }}</p>
-                                        <p class="text-sm text-gray-500">{{ $payment->created_at->format('M d, Y') }}</p>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-right">
+                                            <p class="font-bold text-gray-800">₱{{ number_format($payment->total_amount, 2) }}</p>
+                                            <p class="text-xs font-semibold {{ $payment->status === 'paid' ? 'text-green-600' : ($payment->status === 'cancelled' ? 'text-red-600' : 'text-yellow-600') }}">
+                                                {{ ucfirst($payment->status) }}
+                                            </p>
+                                        </div>
+                                        <div class="text-gray-400">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-gray-800">₱{{ number_format($payment->total_amount, 2) }}</p>
-                                    <p class="text-xs font-semibold {{ $payment->status === 'paid' ? 'text-green-600' : ($payment->status === 'cancelled' ? 'text-red-600' : 'text-yellow-600') }}">
-                                        {{ ucfirst($payment->status) }}
-                                    </p>
-                                </div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 @else
@@ -172,23 +179,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Make Payment -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Make a Payment</h2>
-
-                <div class="space-y-3">
-                    <button disabled class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-semibold cursor-not-allowed">
-                        <i class="fas fa-lock mr-2"></i>Pay Online
-                    </button>
-
-                    <p class="text-xs text-center text-gray-500">Online payment available after inspection approval</p>
-
-                    <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-                        <i class="fas fa-download mr-2"></i>Download Invoice
-                    </button>
                 </div>
             </div>
 

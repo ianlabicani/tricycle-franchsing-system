@@ -3,6 +3,7 @@
 use App\Http\Controllers\Driver\ApplicationController;
 use App\Http\Controllers\Driver\DashboardController;
 use App\Http\Controllers\Driver\NotificationController;
+use App\Http\Controllers\Driver\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->group(function () {
@@ -36,9 +37,8 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
     Route::get('/application/{application}/payment/{payment}/download', [ApplicationController::class, 'downloadPaymentPdf'])->name('payment.download');
 
     // Payments
-    Route::get('/payments', function () {
-        return view('driver.payments');
-    })->name('payments');
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
+    Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
 
     // Profile
     Route::get('/profile', function () {
