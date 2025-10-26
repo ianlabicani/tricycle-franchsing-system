@@ -1,3 +1,8 @@
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-300 text-red-800 rounded-lg">
+            <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+        </div>
+    @endif
 @extends('driver.shell')
 
 @section('driver-content')

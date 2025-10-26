@@ -52,6 +52,8 @@ class Application extends Model
         'released_by',
     ];
 
+
+
     public function casts(): array
     {
         return [
@@ -69,6 +71,17 @@ class Application extends Model
             'expiration_date' => 'datetime',
             'renewal_reminder_sent_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Check if a user has an active (not finished) application.
+     * "Active" means not completed, released, or rejected.
+     */
+    public static function userHasActive($userId): bool
+    {
+        return self::where('user_id', $userId)
+            ->whereNotIn('status', ['completed', 'released', 'rejected'])
+            ->exists();
     }
 
     protected static function booted()

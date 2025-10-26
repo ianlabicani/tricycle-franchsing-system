@@ -42,12 +42,22 @@ class ApplicationController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
+        if (Application::userHasActive($user->id)) {
+            return redirect()->route('driver.application')
+                ->with('error', 'You already have an active application. Please complete or cancel it before creating a new one.');
+        }
+
         return view('driver.application.create');
     }
 
     public function store(Request $request)
     {
         $user = $request->user();
+        if (Application::userHasActive($user->id)) {
+            return redirect()->route('driver.application')
+                ->with('error', 'You already have an active application. Please complete or cancel it before creating a new one.');
+        }
 
         $validated = $request->validate([
             'franchise_type' => 'required|in:new,renewal,amendment',

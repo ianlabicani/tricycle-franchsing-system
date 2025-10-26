@@ -1,3 +1,8 @@
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-300 text-red-800 rounded-lg">
+            <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+        </div>
+    @endif
 @extends('driver.shell')
 
 @section('driver-content')
@@ -18,7 +23,12 @@
                 <h1 class="text-3xl font-bold text-gray-800">My Applications</h1>
                 <p class="text-gray-600 mt-2">View and manage your franchise applications</p>
             </div>
-            <a href="{{ route('driver.application.create') }}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold shadow-lg">
+            @php
+                $hasActive = $applications->whereNotIn('status', ['completed', 'released', 'rejected'])->count() > 0;
+            @endphp
+            <a href="{{ $hasActive ? '#' : route('driver.application.create') }}"
+               class="px-6 py-3 {{ $hasActive ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-lg transition font-semibold shadow-lg"
+               @if($hasActive) onclick="return false;" title="You already have an active application." @endif>
                 <i class="fas fa-plus-circle mr-2"></i>New Application
             </a>
         </div>
