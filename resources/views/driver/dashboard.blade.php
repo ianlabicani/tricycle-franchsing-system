@@ -62,9 +62,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Latest Completed Application (when no active) -->
-        @if($latestApprovedApplication)
     @else
         <!-- Application Progress Tracker -->
         @php
@@ -422,6 +419,5 @@
             </div>
         </div>
         @endif
-    @endif
 
 @endsection
