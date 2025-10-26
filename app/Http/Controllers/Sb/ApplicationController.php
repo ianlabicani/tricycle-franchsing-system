@@ -66,10 +66,10 @@ class ApplicationController extends Controller
                 ->with('error', 'Cannot approve application: Not all documents have been approved. Please review and approve all documents first.');
         }
 
-        // Check if driver has another active application
+        // Check if driver has another active application (excluding for_renewal and archived which are terminal states)
         $otherActiveApps = Application::where('user_id', $application->user_id)
             ->where('id', '!=', $application->id)
-            ->whereNotIn('status', ['completed', 'released', 'rejected'])
+            ->whereNotIn('status', ['completed', 'released', 'rejected', 'archived', 'for_renewal'])
             ->exists();
 
         if ($otherActiveApps) {
@@ -121,11 +121,11 @@ class ApplicationController extends Controller
             'expiration_date' => $now->copy()->addYears(3),
         ]);
 
-        // If this is a renewal application, archive the previous completed application
+        // If this is a renewal application, archive the previous completed or for_renewal application
         if ($application->franchise_type === 'renewal') {
             $previousApp = Application::where('user_id', $application->user_id)
                 ->where('id', '!=', $application->id)
-                ->where('status', 'completed')
+                ->whereIn('status', ['completed', 'for_renewal'])
                 ->latest()
                 ->first();
 
@@ -178,7 +178,7 @@ class ApplicationController extends Controller
         $application->refresh();
 
         return redirect()->route('sb.applications.show', $application)
-            ->with('success', 'Test renewal triggered! Renewal check command executed. Application status updated to: ' . ucfirst(str_replace('_', ' ', $application->status)));
+            ->with('success', 'Test renewal triggered! Renewal check command executed. Application status updated to: '.ucfirst(str_replace('_', ' ', $application->status)));
     }
 
     public function review(Request $request, Application $application)
@@ -199,10 +199,10 @@ class ApplicationController extends Controller
                     ->with('error', 'Cannot mark as complete: Not all documents have been approved. Please review and approve all documents first.');
             }
 
-            // Check if driver has another active application
+            // Check if driver has another active application (excluding for_renewal which is allowed for renewals)
             $otherActiveApps = Application::where('user_id', $application->user_id)
                 ->where('id', '!=', $application->id)
-                ->whereNotIn('status', ['completed', 'released', 'rejected'])
+                ->whereNotIn('status', ['completed', 'released', 'rejected', 'archived', 'for_renewal'])
                 ->exists();
 
             if ($otherActiveApps) {

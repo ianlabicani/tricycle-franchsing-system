@@ -24,11 +24,14 @@
                 <p class="text-gray-600 mt-2">View and manage your franchise applications</p>
             </div>
             @php
-                $hasActive = $applications->whereNotIn('status', ['completed', 'released', 'rejected'])->count() > 0;
+                // Check if there's an active application that blocks creation
+                // Allow creation if the only "active" status is for_renewal, completed, released, or rejected
+                $blockingStatuses = ['draft', 'pending_review', 'incomplete', 'for_scheduling', 'inspection_scheduled', 'inspection_pending', 'inspection_failed', 'for_treasury', 'for_approval'];
+                $hasBlockingApplication = $applications->whereIn('status', $blockingStatuses)->count() > 0;
             @endphp
-            <a href="{{ $hasActive ? '#' : route('driver.application.create') }}"
-               class="px-6 py-3 {{ $hasActive ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-lg transition font-semibold shadow-lg"
-               @if($hasActive) onclick="return false;" title="You already have an active application." @endif>
+            <a href="{{ $hasBlockingApplication ? '#' : route('driver.application.create') }}"
+               class="px-6 py-3 {{ $hasBlockingApplication ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-lg transition font-semibold shadow-lg"
+               @if($hasBlockingApplication) onclick="return false;" title="You already have an active application." @endif>
                 <i class="fas fa-plus-circle mr-2"></i>New Application
             </a>
         </div>

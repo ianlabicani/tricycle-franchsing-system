@@ -71,7 +71,7 @@
                     <i class="fas fa-calendar-check mr-2"></i>Schedule Vehicle Inspection
                 </a>
             </div>
-            @elseif(!in_array($application->status, ['approved', 'rejected', 'released', 'completed']))
+            @elseif(!in_array($application->status, ['approved', 'rejected', 'released', 'completed', 'archived']))
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Review Actions</h2>
 
