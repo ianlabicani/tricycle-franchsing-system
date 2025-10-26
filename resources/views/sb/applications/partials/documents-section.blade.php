@@ -20,7 +20,7 @@
                     ];
                     $statusBadgeColor = $statusBadgeColors[$document->status] ?? 'bg-gray-100 text-gray-800';
                 @endphp
-                <div class="flex items-start justify-between p-4 border rounded-lg {{ $statusBgColor }}">
+                <div class="flex items-start justify-between p-4 border rounded-lg {{ $statusBgColor }}" data-document-id="{{ $document->id }}">
                     <div class="flex items-start space-x-3 flex-1">
                         <div class="text-2xl mt-1">
                             @if(strpos($document->document_type, 'id') !== false || strpos($document->document_type, 'cedula') !== false)
@@ -40,19 +40,14 @@
                         <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusBadgeColor }}">
                             {{ ucfirst($document->status) }}
                         </span>
-                        @if($document->status === 'pending' || $document->status === 'rejected')
-                            <form action="{{ route('sb.applications.documents.approve', [$application, $document]) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm" title="Approve">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            </form>
-                        @endif
-                        @if($document->status !== 'rejected')
-                            <button onclick="openRejectModal('{{ $document->id }}')" class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm" title="Reject">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        @endif
+                        <button onclick="openDocumentViewModal({{ $document->id }}, '{{ $document->document_type }}', '{{ $document->status }}', '{{ $document->created_at->format('M d, Y') }}', '-')"
+                            class="text-purple-600 hover:text-purple-700 font-semibold text-sm whitespace-nowrap px-3 py-1 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                            <i class="fas fa-eye mr-1"></i>View
+                        </button>
+                        <a href="{{ route('sb.documents.download', [$application, $document]) }}"
+                            class="text-purple-600 hover:text-purple-700 font-semibold text-sm whitespace-nowrap px-3 py-1 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </a>
                     </div>
                 </div>
             @endforeach
