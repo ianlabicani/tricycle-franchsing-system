@@ -58,65 +58,65 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h2>
 
-                <div class="space-y-4">
+                <div class="space-y-4" x-data="{ openAccordion: null }">
                     <!-- FAQ Item -->
                     <div class="border-b border-gray-200 pb-4">
-                        <button class="w-full text-left flex items-start justify-between group">
+                        <button @click="openAccordion = openAccordion === 1 ? null : 1" class="w-full text-left flex items-start justify-between group">
                             <div class="flex-1">
                                 <h3 class="font-bold text-gray-800 group-hover:text-blue-600 transition">How long does the application process take?</h3>
-                                <p class="text-sm text-gray-600 mt-2">The entire franchise application process typically takes 2-3 weeks from submission to approval, depending on document verification and inspection scheduling.</p>
+                                <p x-show="openAccordion === 1" class="text-sm text-gray-600 mt-2">The entire franchise application process typically takes 2-3 weeks from submission to approval, depending on document verification and inspection scheduling.</p>
                             </div>
-                            <i class="fas fa-chevron-down text-gray-400 mt-1"></i>
+                            <i class="fas fa-chevron-down text-gray-400 mt-1 transition" :class="{ 'rotate-180': openAccordion === 1 }"></i>
                         </button>
                     </div>
 
                     <div class="border-b border-gray-200 pb-4">
-                        <button class="w-full text-left flex items-start justify-between group">
+                        <button @click="openAccordion = openAccordion === 2 ? null : 2" class="w-full text-left flex items-start justify-between group">
                             <div class="flex-1">
                                 <h3 class="font-bold text-gray-800 group-hover:text-blue-600 transition">What documents do I need to submit?</h3>
-                                <p class="text-sm text-gray-600 mt-2">You need: Valid Driver's License, Vehicle OR/CR, Police Clearance, Barangay Clearance, and Medical Certificate. All documents must be valid and not expired.</p>
+                                <p x-show="openAccordion === 2" class="text-sm text-gray-600 mt-2">You need: Valid Driver's License, Vehicle OR/CR, Police Clearance, Barangay Clearance, and Medical Certificate. All documents must be valid and not expired.</p>
                             </div>
-                            <i class="fas fa-chevron-down text-gray-400 mt-1"></i>
+                            <i class="fas fa-chevron-down text-gray-400 mt-1 transition" :class="{ 'rotate-180': openAccordion === 2 }"></i>
                         </button>
                     </div>
 
                     <div class="border-b border-gray-200 pb-4">
-                        <button class="w-full text-left flex items-start justify-between group">
+                        <button @click="openAccordion = openAccordion === 3 ? null : 3" class="w-full text-left flex items-start justify-between group">
                             <div class="flex-1">
                                 <h3 class="font-bold text-gray-800 group-hover:text-blue-600 transition">How much is the total franchise fee?</h3>
-                                <p class="text-sm text-gray-600 mt-2">The total franchise fee is ₱8,500.00 which includes inspection fee (₱1,500), processing fee (₱2,000), and annual franchise fee (₱5,000).</p>
+                                <p x-show="openAccordion === 3" class="text-sm text-gray-600 mt-2">The total franchise fee is ₱8,500.00 which includes inspection fee (₱1,500), processing fee (₱2,000), and annual franchise fee (₱5,000).</p>
                             </div>
-                            <i class="fas fa-chevron-down text-gray-400 mt-1"></i>
+                            <i class="fas fa-chevron-down text-gray-400 mt-1 transition" :class="{ 'rotate-180': openAccordion === 3 }"></i>
                         </button>
                     </div>
 
                     <div class="border-b border-gray-200 pb-4">
-                        <button class="w-full text-left flex items-start justify-between group">
+                        <button @click="openAccordion = openAccordion === 4 ? null : 4" class="w-full text-left flex items-start justify-between group">
                             <div class="flex-1">
                                 <h3 class="font-bold text-gray-800 group-hover:text-blue-600 transition">Can I reschedule my inspection?</h3>
-                                <p class="text-sm text-gray-600 mt-2">Yes, you can reschedule your inspection up to 48 hours before the scheduled time. Go to the Inspection page and click "Reschedule".</p>
+                                <p x-show="openAccordion === 4" class="text-sm text-gray-600 mt-2">Yes, you can reschedule your inspection up to 48 hours before the scheduled time. Go to the Inspection page and click "Reschedule".</p>
                             </div>
-                            <i class="fas fa-chevron-down text-gray-400 mt-1"></i>
+                            <i class="fas fa-chevron-down text-gray-400 mt-1 transition" :class="{ 'rotate-180': openAccordion === 4 }"></i>
                         </button>
                     </div>
 
                     <div class="border-b border-gray-200 pb-4">
-                        <button class="w-full text-left flex items-start justify-between group">
+                        <button @click="openAccordion = openAccordion === 5 ? null : 5" class="w-full text-left flex items-start justify-between group">
                             <div class="flex-1">
                                 <h3 class="font-bold text-gray-800 group-hover:text-blue-600 transition">What payment methods are accepted?</h3>
-                                <p class="text-sm text-gray-600 mt-2">We accept over-the-counter payments at the Treasury Office, GCash, PayMaya, and bank transfers. Online payment is available after inspection approval.</p>
+                                <p x-show="openAccordion === 5" class="text-sm text-gray-600 mt-2">We accept over-the-counter payments at the Treasury Office, GCash, PayMaya, and bank transfers. Online payment is available after inspection approval.</p>
                             </div>
-                            <i class="fas fa-chevron-down text-gray-400 mt-1"></i>
+                            <i class="fas fa-chevron-down text-gray-400 mt-1 transition" :class="{ 'rotate-180': openAccordion === 5 }"></i>
                         </button>
                     </div>
 
                     <div class="pb-4">
-                        <button class="w-full text-left flex items-start justify-between group">
+                        <button @click="openAccordion = openAccordion === 6 ? null : 6" class="w-full text-left flex items-start justify-between group">
                             <div class="flex-1">
                                 <h3 class="font-bold text-gray-800 group-hover:text-blue-600 transition">How often do I need to renew my franchise?</h3>
-                                <p class="text-sm text-gray-600 mt-2">Franchises must be renewed annually. You'll receive reminders 90 days and 30 days before expiration. Renewal process is similar to initial application.</p>
+                                <p x-show="openAccordion === 6" class="text-sm text-gray-600 mt-2">Franchises must be renewed annually. You'll receive reminders 90 days and 30 days before expiration. Renewal process is similar to initial application.</p>
                             </div>
-                            <i class="fas fa-chevron-down text-gray-400 mt-1"></i>
+                            <i class="fas fa-chevron-down text-gray-400 mt-1 transition" :class="{ 'rotate-180': openAccordion === 6 }"></i>
                         </button>
                     </div>
                 </div>
