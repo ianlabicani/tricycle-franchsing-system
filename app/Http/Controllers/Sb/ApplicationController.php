@@ -121,6 +121,22 @@ class ApplicationController extends Controller
             'expiration_date' => $now->copy()->addYears(3),
         ]);
 
+        // If this is a renewal application, archive the previous completed application
+        if ($application->franchise_type === 'renewal') {
+            $previousApp = Application::where('user_id', $application->user_id)
+                ->where('id', '!=', $application->id)
+                ->where('status', 'completed')
+                ->latest()
+                ->first();
+
+            if ($previousApp) {
+                $previousApp->update([
+                    'status' => 'archived',
+                    'archived_at' => $now,
+                ]);
+            }
+        }
+
         return redirect()->route('sb.applications.show', $application)
             ->with('success', 'Application completed successfully.');
     }

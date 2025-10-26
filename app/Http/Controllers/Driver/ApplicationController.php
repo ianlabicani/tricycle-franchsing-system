@@ -97,21 +97,6 @@ class ApplicationController extends Controller
         // Build full name from components
         $fullName = trim($validated['first_name'].' '.$validated['middle_name'].' '.$validated['last_name']);
 
-        // If this is a renewal, archive the previous application
-        if ($validated['franchise_type'] === 'renewal') {
-            $previousApp = Application::where('user_id', $user->id)
-                ->where('status', '!=', 'archived')
-                ->latest()
-                ->first();
-
-            if ($previousApp) {
-                $previousApp->update([
-                    'status' => 'archived',
-                    'archived_at' => now(),
-                ]);
-            }
-        }
-
         $application = Application::create([
             'user_id' => $user->id,
             'franchise_type' => $validated['franchise_type'],
