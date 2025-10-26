@@ -8,7 +8,6 @@ use App\Models\ApplicationDocument;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApplicationController extends Controller
 {
@@ -62,7 +61,7 @@ class ApplicationController extends Controller
         }
 
         // Check if all documents are approved before approving application
-        if (!$application->allDocumentsApproved()) {
+        if (! $application->allDocumentsApproved()) {
             return redirect()->route('sb.applications.show', $application)
                 ->with('error', 'Cannot approve application: Not all documents have been approved. Please review and approve all documents first.');
         }
@@ -80,6 +79,8 @@ class ApplicationController extends Controller
 
         $application->update([
             'status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
         ]);
 
         return redirect()->route('sb.applications.show', $application)
@@ -96,6 +97,8 @@ class ApplicationController extends Controller
 
         $application->update([
             'status' => 'released',
+            'released_at' => now(),
+            'released_by' => auth()->id(),
         ]);
 
         return redirect()->route('sb.applications.show', $application)
@@ -110,9 +113,12 @@ class ApplicationController extends Controller
                 ->with('error', 'Application must have documents released before completing.');
         }
 
+        $now = now();
         $application->update([
             'status' => 'completed',
-            'date_completed' => now(),
+            'completed_at' => $now,
+            'date_completed' => $now,
+            'expiration_date' => $now->copy()->addYears(3),
         ]);
 
         return redirect()->route('sb.applications.show', $application)
@@ -149,7 +155,7 @@ class ApplicationController extends Controller
 
         // If marking as complete (for_scheduling), check if all documents are approved
         if ($status === 'for_scheduling') {
-            if (!$application->allDocumentsApproved()) {
+            if (! $application->allDocumentsApproved()) {
                 return redirect()->route('sb.applications.show', $application)
                     ->with('error', 'Cannot mark as complete: Not all documents have been approved. Please review and approve all documents first.');
             }
@@ -166,10 +172,15 @@ class ApplicationController extends Controller
             }
         }
 
-        $application->update([
+        $updateFields = [
             'status' => $status,
             'remarks' => $request->remarks,
-        ]);
+        ];
+        if ($status === 'for_scheduling') {
+            $updateFields['reviewed_at'] = now();
+            $updateFields['reviewed_by'] = auth()->id();
+        }
+        $application->update($updateFields);
 
         $message = $status === 'for_scheduling'
             ? 'Application marked as complete and ready for scheduling.'
@@ -197,7 +208,7 @@ class ApplicationController extends Controller
         ]);
 
         return redirect()->route('sb.applications.show', $application)
-            ->with('success', ucfirst($document->document_label) . ' approved successfully.');
+            ->with('success', ucfirst($document->document_label).' approved successfully.');
     }
 
     /**
@@ -223,7 +234,7 @@ class ApplicationController extends Controller
         ]);
 
         return redirect()->route('sb.applications.show', $application)
-            ->with('success', ucfirst($document->document_label) . ' rejected. Driver will be notified.');
+            ->with('success', ucfirst($document->document_label).' rejected. Driver will be notified.');
     }
 
     /**

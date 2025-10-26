@@ -130,6 +130,7 @@ class PaymentController extends Controller
                 ->with('error', 'Only pending payments can be verified.');
         }
 
+
         $payment->update([
             'status' => 'paid',
             'paid_at' => $request->paid_at,
@@ -137,10 +138,11 @@ class PaymentController extends Controller
             'verified_by' => $request->user()->id,
         ]);
 
-        // Update application status to for_approval
+        // Update application status and payment_verified_at
         $application = $payment->application;
         $application->update([
             'status' => 'for_approval',
+            'payment_verified_at' => now(),
         ]);
 
         return redirect()->route('sb.payments.show', $payment)

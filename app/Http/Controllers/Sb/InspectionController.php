@@ -75,6 +75,7 @@ class InspectionController extends Controller
                 ->with('error', 'Application must have a schedule before creating an inspection.');
         }
 
+
         $inspection = Inspection::create([
             'application_id' => $request->application_id,
             'scheduled_date' => $request->scheduled_date,
@@ -86,9 +87,10 @@ class InspectionController extends Controller
             'scheduled_by' => $request->user()->id,
         ]);
 
-        // Update application status
+        // Update application status and scheduled_at
         $application->update([
             'status' => 'inspection_scheduled',
+            'scheduled_at' => now(),
         ]);
 
         return redirect()->route('sb.inspections.show', $inspection)
@@ -138,6 +140,7 @@ class InspectionController extends Controller
             'remarks' => 'required|string|max:500',
         ]);
 
+
         $inspection->update([
             'status' => 'completed',
             'result' => $request->result,
@@ -146,17 +149,18 @@ class InspectionController extends Controller
             'remarks' => $request->remarks,
         ]);
 
-        // Update application status based on result
+        // Update application status and inspected_at based on result
         $application = $inspection->application;
         if ($request->result === 'passed') {
-            // Only update status - don't create payment automatically
             $application->update([
                 'status' => 'for_treasury',
+                'inspected_at' => now(),
             ]);
         } else {
             $application->update([
                 'status' => 'inspection_failed',
                 'remarks' => $request->remarks,
+                'inspected_at' => now(),
             ]);
         }
 
