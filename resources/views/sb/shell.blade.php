@@ -36,11 +36,11 @@
                     <i class="fas fa-money-bill-wave"></i>
                     <span>Payments</span>
                 </a>
-                <a href="{{ route('sb.dashboard') }}" class="text-white hover:bg-purple-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2">
+                <a href="{{ route('sb.drivers.index') }}" class="text-white hover:bg-purple-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('sb.drivers.*') ? 'bg-purple-500' : '' }}">
                     <i class="fas fa-users"></i>
                     <span>Drivers</span>
                 </a>
-                <a href="{{ route('sb.dashboard') }}" class="text-white hover:bg-purple-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2">
+                <a href="{{ route('sb.reports.index') }}" class="text-white hover:bg-purple-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('sb.reports.*') ? 'bg-purple-500' : '' }}">
                     <i class="fas fa-chart-bar"></i>
                     <span>Reports</span>
                 </a>
@@ -48,14 +48,6 @@
 
             <!-- Right Side - User Menu -->
             <div class="flex items-center space-x-4">
-
-                <!-- Notifications -->
-                <div class="relative">
-                    <button class="text-white hover:bg-purple-500 p-2 rounded-lg transition relative">
-                        <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">5</span>
-                    </button>
-                </div>
 
                 <!-- User Dropdown -->
                 <div class="relative" x-data="{ open: false }">
@@ -136,11 +128,11 @@
                 <i class="fas fa-money-bill-wave"></i>
                 <span>Payments</span>
             </a>
-            <a href="{{ route('sb.dashboard') }}" class="block text-white hover:bg-purple-600 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2">
+            <a href="{{ route('sb.drivers.index') }}" class="block text-white hover:bg-purple-600 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('sb.drivers.*') ? 'bg-purple-600' : '' }}">
                 <i class="fas fa-users"></i>
                 <span>Drivers</span>
             </a>
-            <a href="{{ route('sb.dashboard') }}" class="block text-white hover:bg-purple-600 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2">
+            <a href="{{ route('sb.reports.index') }}" class="block text-white hover:bg-purple-600 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('sb.reports.*') ? 'bg-purple-600' : '' }}">
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>

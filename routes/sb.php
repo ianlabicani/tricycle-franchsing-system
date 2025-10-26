@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\SB\ApplicationController;
+use App\Http\Controllers\SB\DriverController;
 use App\Http\Controllers\SB\InspectionController;
 use App\Http\Controllers\SB\PaymentController;
+use App\Http\Controllers\SB\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(function () {
@@ -46,4 +48,12 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::put('/inspections/{inspection}', [InspectionController::class, 'update'])->name('inspections.update');
     Route::post('/inspections/{inspection}/complete', [InspectionController::class, 'complete'])->name('inspections.complete');
     Route::post('/inspections/{inspection}/cancel', [InspectionController::class, 'cancel'])->name('inspections.cancel');
+
+    // Driver Management
+    Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.index');
+    Route::get('/drivers/{user}', [DriverController::class, 'show'])->name('drivers.show');
+
+    // Reports & Analytics
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{report_type}', [ReportController::class, 'show'])->name('reports.show');
 });

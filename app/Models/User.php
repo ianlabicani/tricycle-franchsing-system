@@ -55,6 +55,14 @@ class User extends Authenticatable
         return $this->hasOne(Profile::class);
     }
 
+    /**
+     * Get the user's applications.
+     */
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class)->withTimestamps();
