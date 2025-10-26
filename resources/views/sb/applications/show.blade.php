@@ -35,6 +35,27 @@
         </div>
     @endif
 
+    <!-- Warning: Not all documents approved -->
+    @if(!$application->allDocumentsApproved() && !in_array($application->status, ['rejected', 'completed', 'released']))
+        <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg mb-6">
+            <div class="flex items-start space-x-4">
+                <i class="fas fa-exclamation-circle text-red-600 text-3xl mt-1"></i>
+                <div>
+                    <h3 class="text-lg font-bold text-red-900">⚠️ Cannot Proceed: Documents Not Approved</h3>
+                    <p class="text-red-800 mt-1">All documents must be approved before proceeding to the next step. Review the documents section below and approve all items.</p>
+                    <div class="mt-3 space-y-1 text-sm text-red-700">
+                        @if($application->pendingDocuments()->count() > 0)
+                            <p><i class="fas fa-clock mr-2"></i><strong>Pending:</strong> {{ $application->pendingDocuments()->count() }} document(s) awaiting review</p>
+                        @endif
+                        @if($application->rejectedDocuments()->count() > 0)
+                            <p><i class="fas fa-times mr-2"></i><strong>Rejected:</strong> {{ $application->rejectedDocuments()->count() }} document(s) requiring re-upload</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Current Action Required Banner -->
     @if($application->status === 'pending_review')
         <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg mb-6">
@@ -138,12 +159,18 @@
                         @endif
                     </div>
                 </div>
-                <form action="{{ route('sb.applications.approve', $application) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold whitespace-nowrap">
-                        <i class="fas fa-check-circle mr-2"></i>Approve Now
+                @if(!$application->allDocumentsApproved())
+                    <button disabled class="px-6 py-3 bg-gray-400 text-white rounded-lg cursor-not-allowed font-semibold whitespace-nowrap opacity-50" title="All documents must be approved">
+                        <i class="fas fa-lock mr-2"></i>Cannot Approve (Documents Not Reviewed)
                     </button>
-                </form>
+                @else
+                    <form action="{{ route('sb.applications.approve', $application) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold whitespace-nowrap">
+                            <i class="fas fa-check-circle mr-2"></i>Approve Now
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     @elseif($application->status === 'approved')
@@ -749,12 +776,24 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Review Actions</h2>
 
-                <div class="space-y-3">
-                    <!-- Review Button (Mark Complete or Incomplete) -->
-                    <button onclick="openReviewModal()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+                @if(!$application->allDocumentsApproved())
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-4">
+                        <p class="text-sm text-red-800 font-semibold">
+                            <i class="fas fa-lock mr-2"></i>Review actions disabled
+                        </p>
+                        <p class="text-xs text-red-700 mt-1">All documents must be approved first</p>
+                    </div>
+                    <button disabled class="w-full bg-gray-400 text-white py-3 rounded-lg cursor-not-allowed font-semibold opacity-50">
                         <i class="fas fa-clipboard-check mr-2"></i>Review Documents
                     </button>
-                </div>
+                @else
+                    <div class="space-y-3">
+                        <!-- Review Button (Mark Complete or Incomplete) -->
+                        <button onclick="openReviewModal()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+                            <i class="fas fa-clipboard-check mr-2"></i>Review Documents
+                        </button>
+                    </div>
+                @endif
             </div>
             @endif
 

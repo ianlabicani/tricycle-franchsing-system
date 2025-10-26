@@ -61,6 +61,12 @@ class ApplicationController extends Controller
                 ->with('error', 'Application must be in "For Approval" status to be approved.');
         }
 
+        // Check if all documents are approved before approving application
+        if (!$application->allDocumentsApproved()) {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Cannot approve application: Not all documents have been approved. Please review and approve all documents first.');
+        }
+
         // Check if driver has another active application
         $otherActiveApps = Application::where('user_id', $application->user_id)
             ->where('id', '!=', $application->id)
@@ -141,8 +147,14 @@ class ApplicationController extends Controller
         // If complete, mark as ready for scheduling
         $status = $request->is_complete ? 'for_scheduling' : 'incomplete';
 
-        // If marking as complete (for_scheduling), check if driver has another active application
+        // If marking as complete (for_scheduling), check if all documents are approved
         if ($status === 'for_scheduling') {
+            if (!$application->allDocumentsApproved()) {
+                return redirect()->route('sb.applications.show', $application)
+                    ->with('error', 'Cannot mark as complete: Not all documents have been approved. Please review and approve all documents first.');
+            }
+
+            // Check if driver has another active application
             $otherActiveApps = Application::where('user_id', $application->user_id)
                 ->where('id', '!=', $application->id)
                 ->whereNotIn('status', ['completed', 'released', 'rejected'])

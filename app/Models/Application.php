@@ -203,9 +203,9 @@ class Application extends Model
             return false;
         }
 
-        // Check if all documents are approved
+        // Check if all documents are approved (no pending or rejected documents)
         return $this->documents()
-            ->where('approval_status', '!=', 'approved')
+            ->whereIn('status', ['pending', 'rejected'])
             ->doesntExist();
     }
 
