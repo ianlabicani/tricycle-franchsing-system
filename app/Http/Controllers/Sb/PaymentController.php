@@ -126,7 +126,7 @@ class PaymentController extends Controller
         ]);
 
         if ($payment->status !== 'pending') {
-            return redirect()->route('sb.payments.show', $payment)
+            return redirect()->route('sb.applications.show', $payment->application)
                 ->with('error', 'Only pending payments can be verified.');
         }
 
@@ -145,7 +145,7 @@ class PaymentController extends Controller
             'payment_verified_at' => now(),
         ]);
 
-        return redirect()->route('sb.payments.show', $payment)
+        return redirect()->route('sb.applications.show', $application)
             ->with('success', 'Payment verified successfully. Application is now for approval.');
     }
 
