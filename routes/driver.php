@@ -30,6 +30,10 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
     Route::get('/application/{application}/document/{document}/download', [ApplicationController::class, 'downloadDocument'])->name('application.document.download');
     Route::post('/applications/{application}/documents/reupload', [ApplicationController::class, 'reuploadDocument'])->name('application.document.reupload');
 
+    // Payment Breakdown
+    Route::get('/application/{application}/payment/{payment}/preview', [ApplicationController::class, 'previewPaymentPdf'])->name('payment.preview');
+    Route::get('/application/{application}/payment/{payment}/download', [ApplicationController::class, 'downloadPaymentPdf'])->name('payment.download');
+
     // Payments
     Route::get('/payments', function () {
         return view('driver.payments');

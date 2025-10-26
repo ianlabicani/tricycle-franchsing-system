@@ -33,6 +33,8 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::get('/payments/{payment}', [PaymentController::class, 'show'])->name('payments.show');
     Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
     Route::post('/payments/{payment}/cancel', [PaymentController::class, 'cancel'])->name('payments.cancel');
+    Route::get('/payments/{payment}/pdf/preview', [PaymentController::class, 'previewPaymentPdf'])->name('payments.pdf.preview');
+    Route::get('/payments/{payment}/pdf/download', [PaymentController::class, 'downloadPaymentPdf'])->name('payments.pdf.download');
 
     // Inspection Management
     Route::get('/inspections', [InspectionController::class, 'index'])->name('inspections.index');

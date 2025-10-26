@@ -239,6 +239,23 @@
             </div>
             @endif
 
+            <!-- Payment Breakdown PDF -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Payment Breakdown</h2>
+
+                <div class="space-y-3">
+                    <a href="{{ route('sb.payments.pdf.preview', $payment) }}" target="_blank" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center">
+                        <i class="fas fa-eye mr-2"></i>View PDF
+                    </a>
+
+                    <a href="{{ route('sb.payments.pdf.download', $payment) }}" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold flex items-center justify-center">
+                        <i class="fas fa-download mr-2"></i>Download PDF
+                    </a>
+                </div>
+            </div>
+
+
+
             <!-- Payment Summary -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Payment Summary</h2>

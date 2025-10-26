@@ -168,4 +168,80 @@ class PaymentController extends Controller
         return redirect()->route('sb.payments.show', $payment)
             ->with('success', 'Payment cancelled successfully.');
     }
+
+    /**
+     * Preview payment breakdown as PDF
+     */
+    public function previewPaymentPdf(Payment $payment)
+    {
+        $this->authorize('view', $payment);
+
+        try {
+            $html = view('driver.application.partials.payment-pdf', [
+                'application' => $payment->application,
+                'payment' => $payment,
+            ])->render();
+
+            // Using DomPDF if available, otherwise return HTML view
+            if (class_exists('Barryvdh\DomPDF\Facade\Pdf')) {
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('driver.application.partials.payment-pdf', [
+                    'application' => $payment->application,
+                    'payment' => $payment,
+                ]);
+
+                return $pdf->stream('payment-breakdown.pdf');
+            } else {
+                // Fallback: return as HTML with print styles
+                return response()->view('driver.application.partials.payment-pdf', [
+                    'application' => $payment->application,
+                    'payment' => $payment,
+                ], 200, [
+                    'Content-Type' => 'text/html; charset=utf-8',
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error("Error previewing payment PDF: {$e->getMessage()}");
+
+            return redirect()->route('sb.payments.show', $payment)
+                ->with('error', 'Error generating PDF preview');
+        }
+    }
+
+    /**
+     * Download payment breakdown as PDF
+     */
+    public function downloadPaymentPdf(Payment $payment)
+    {
+        $this->authorize('view', $payment);
+
+        try {
+            if (class_exists('Barryvdh\DomPDF\Facade\Pdf')) {
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('driver.application.partials.payment-pdf', [
+                    'application' => $payment->application,
+                    'payment' => $payment,
+                ]);
+
+                $fileName = "payment-breakdown-{$payment->payment_no}.pdf";
+
+                return $pdf->download($fileName);
+            } else {
+                // Fallback: send HTML as downloadable file
+                $html = view('driver.application.partials.payment-pdf', [
+                    'application' => $payment->application,
+                    'payment' => $payment,
+                ])->render();
+
+                $fileName = "payment-breakdown-{$payment->payment_no}.html";
+
+                return response($html)
+                    ->header('Content-Type', 'application/octet-stream')
+                    ->header('Content-Disposition', "attachment; filename=\"{$fileName}\"");
+            }
+        } catch (\Exception $e) {
+            \Log::error("Error downloading payment PDF: {$e->getMessage()}");
+
+            return redirect()->route('sb.payments.show', $payment)
+                ->with('error', 'Error generating PDF download');
+        }
+    }
 }
