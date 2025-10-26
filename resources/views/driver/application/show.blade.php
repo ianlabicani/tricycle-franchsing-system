@@ -204,7 +204,13 @@
                                         <div class="flex items-center space-x-2">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                 {{ $doc->status === 'approved' ? 'bg-green-100 text-green-800' : ($doc->status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                                {{ ucfirst($doc->status) }}
+                                                @if($doc->status === 'approved')
+                                                    <i class="fas fa-check-circle mr-1"></i>Approved
+                                                @elseif($doc->status === 'rejected')
+                                                    <i class="fas fa-times-circle mr-1"></i>Rejected
+                                                @else
+                                                    <i class="fas fa-clock mr-1"></i>Pending
+                                                @endif
                                             </span>
                                             @if($doc->isImage())
                                                 <a href="{{ route('driver.application.document.view', [$application, $doc]) }}" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-semibold" title="View image">

@@ -194,6 +194,30 @@ class Application extends Model
     }
 
     /**
+     * Check if all documents have been approved.
+     */
+    public function allDocumentsApproved(): bool
+    {
+        // If no documents, return false
+        if ($this->documents()->count() === 0) {
+            return false;
+        }
+
+        // Check if all documents are approved
+        return $this->documents()
+            ->where('approval_status', '!=', 'approved')
+            ->doesntExist();
+    }
+
+    /**
+     * Check if application has any rejected documents.
+     */
+    public function hasRejectedDocuments(): bool
+    {
+        return $this->rejectedDocuments()->exists();
+    }
+
+    /**
      * Check if application is renewable (expiring soon or expired).
      */
     public function isRenewable(): bool

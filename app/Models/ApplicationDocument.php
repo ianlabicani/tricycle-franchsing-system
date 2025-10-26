@@ -15,6 +15,12 @@ class ApplicationDocument extends Model
         'file_size',
         'status',
         'rejection_reason',
+        'reviewed_by',
+        'reviewed_at',
+    ];
+
+    protected $casts = [
+        'reviewed_at' => 'datetime',
     ];
 
     /**
@@ -23,6 +29,14 @@ class ApplicationDocument extends Model
     public function application()
     {
         return $this->belongsTo(Application::class);
+    }
+
+    /**
+     * Get the SB staff member who reviewed this document.
+     */
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 
     /**

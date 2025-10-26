@@ -20,6 +20,12 @@ Route::middleware(['auth', 'verified'])->prefix('sb')->name('sb.')->group(functi
     Route::post('/applications/{application}/release', [ApplicationController::class, 'release'])->name('applications.release');
     Route::post('/applications/{application}/complete', [ApplicationController::class, 'complete'])->name('applications.complete');
 
+    // Document Management
+    Route::post('/applications/{application}/documents/{document}/approve', [ApplicationController::class, 'approveDocument'])->name('documents.approve');
+    Route::post('/applications/{application}/documents/{document}/reject', [ApplicationController::class, 'rejectDocument'])->name('documents.reject');
+    Route::get('/applications/{application}/documents/{document}/view', [ApplicationController::class, 'viewDocument'])->name('documents.view');
+    Route::get('/applications/{application}/documents/{document}/download', [ApplicationController::class, 'downloadDocument'])->name('documents.download');
+
     // Payment Management
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');

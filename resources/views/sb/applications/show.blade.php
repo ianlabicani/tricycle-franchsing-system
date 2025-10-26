@@ -359,87 +359,79 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-6">Submitted Requirements</h2>
 
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-id-card text-green-600 text-2xl"></i>
-                            <div>
-                                <p class="font-semibold text-gray-800">Valid Driver's License</p>
-                                <p class="text-xs text-gray-500">Uploaded on Oct 1, 2025</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Verified</span>
-                            <button class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
-                                <i class="fas fa-eye mr-1"></i>View
-                            </button>
-                        </div>
-                    </div>
+                @if($application->documents()->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($application->documents as $document)
+                            @php
+                                $statusColors = [
+                                    'pending' => 'bg-yellow-50 border-yellow-200',
+                                    'approved' => 'bg-green-50 border-green-200',
+                                    'rejected' => 'bg-red-50 border-red-200',
+                                ];
+                                $statusBgColor = $statusColors[$document->status] ?? 'bg-gray-50 border-gray-200';
 
-                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-file-alt text-green-600 text-2xl"></i>
-                            <div>
-                                <p class="font-semibold text-gray-800">Vehicle OR/CR</p>
-                                <p class="text-xs text-gray-500">Uploaded on Oct 1, 2025</p>
+                                $statusBadgeColors = [
+                                    'pending' => 'bg-yellow-100 text-yellow-800',
+                                    'approved' => 'bg-green-100 text-green-800',
+                                    'rejected' => 'bg-red-100 text-red-800',
+                                ];
+                                $statusBadgeColor = $statusBadgeColors[$document->status] ?? 'bg-gray-100 text-gray-800';
+                            @endphp
+                            <div class="flex items-start justify-between p-4 border rounded-lg {{ $statusBgColor }}">
+                                <div class="flex items-start space-x-3 flex-1">
+                                    <i class="fas {{ $document->document_icon }} text-2xl" style="color: {{ $document->status === 'approved' ? '#10b981' : ($document->status === 'rejected' ? '#ef4444' : '#f59e0b') }};"></i>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-gray-800">{{ $document->document_label }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            Uploaded on {{ $document->created_at->format('M d, Y') }}
+                                            @if($document->file_size)
+                                                • {{ number_format($document->file_size / 1024, 2) }} KB
+                                            @endif
+                                        </p>
+                                        @if($document->rejection_reason && $document->status === 'rejected')
+                                            <p class="text-xs text-red-700 mt-2">
+                                                <strong>Reason:</strong> {{ $document->rejection_reason }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2 ml-4">
+                                    <span class="{{ $statusBadgeColor }} px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                                        @if($document->status === 'approved')
+                                            <i class="fas fa-check-circle mr-1"></i>Approved
+                                        @elseif($document->status === 'rejected')
+                                            <i class="fas fa-times-circle mr-1"></i>Rejected
+                                        @else
+                                            <i class="fas fa-clock mr-1"></i>Pending
+                                        @endif
+                                    </span>
+                                    <a href="{{ route('sb.documents.view', [$application, $document]) }}" class="text-purple-600 hover:text-purple-700 font-semibold text-sm whitespace-nowrap">
+                                        <i class="fas fa-eye mr-1"></i>View
+                                    </a>
+                                    <a href="{{ route('sb.documents.download', [$application, $document]) }}" class="text-purple-600 hover:text-purple-700 font-semibold text-sm whitespace-nowrap">
+                                        <i class="fas fa-download mr-1"></i>Download
+                                    </a>
+                                    @if($document->status === 'pending')
+                                        <form action="{{ route('sb.documents.approve', [$application, $document]) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="text-green-600 hover:text-green-700 font-semibold text-sm whitespace-nowrap" title="Approve this document">
+                                                <i class="fas fa-check mr-1"></i>Approve
+                                            </button>
+                                        </form>
+                                        <button type="button" onclick="openRejectModal('{{ $document->id }}')" class="text-red-600 hover:text-red-700 font-semibold text-sm whitespace-nowrap" title="Reject this document">
+                                            <i class="fas fa-times mr-1"></i>Reject
+                                        </button>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Verified</span>
-                            <button class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
-                                <i class="fas fa-eye mr-1"></i>View
-                            </button>
-                        </div>
+                        @endforeach
                     </div>
-
-                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-shield-alt text-green-600 text-2xl"></i>
-                            <div>
-                                <p class="font-semibold text-gray-800">Police Clearance</p>
-                                <p class="text-xs text-gray-500">Uploaded on Oct 2, 2025</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Verified</span>
-                            <button class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
-                                <i class="fas fa-eye mr-1"></i>View
-                            </button>
-                        </div>
+                @else
+                    <div class="text-center py-8">
+                        <i class="fas fa-inbox text-gray-400 text-4xl mb-2"></i>
+                        <p class="text-gray-600">No documents submitted yet.</p>
                     </div>
-
-                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-landmark text-green-600 text-2xl"></i>
-                            <div>
-                                <p class="font-semibold text-gray-800">Barangay Clearance</p>
-                                <p class="text-xs text-gray-500">Uploaded on Oct 2, 2025</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Verified</span>
-                            <button class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
-                                <i class="fas fa-eye mr-1"></i>View
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-notes-medical text-green-600 text-2xl"></i>
-                            <div>
-                                <p class="font-semibold text-gray-800">Medical Certificate</p>
-                                <p class="text-xs text-gray-500">Uploaded on Oct 2, 2025</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">Verified</span>
-                            <button class="text-purple-600 hover:text-purple-700 font-semibold text-sm">
-                                <i class="fas fa-eye mr-1"></i>View
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                @endif
             </div>
 
             <!-- Application Timeline -->
@@ -945,6 +937,28 @@
         </div>
     </div>
 
+    <!-- Document Reject Modal -->
+    <div id="documentRejectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Reject Document</h3>
+            <form id="documentRejectForm" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Rejection <span class="text-red-500">*</span></label>
+                    <textarea name="reason" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Explain why this document is being rejected..." required></textarea>
+                </div>
+                <div class="flex space-x-3">
+                    <button type="button" onclick="closeDocumentRejectModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-semibold">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
+                        Reject Document
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Reject Modal -->
     <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
@@ -1014,6 +1028,8 @@
     </div>
 
     <script>
+        let documentToReject = null;
+
         function openRejectModal() {
             document.getElementById('rejectModal').classList.remove('hidden');
             document.getElementById('rejectModal').classList.add('flex');
@@ -1032,6 +1048,29 @@
         function closeReviewModal() {
             document.getElementById('reviewModal').classList.add('hidden');
             document.getElementById('reviewModal').classList.remove('flex');
+        }
+
+        function openRejectModal(documentId) {
+            // Check if this is for document rejection
+            if (documentId) {
+                documentToReject = documentId;
+                // Set the form action to the document reject endpoint
+                const form = document.getElementById('documentRejectForm');
+                const appId = '{{ $application->id }}';
+                form.action = `/sb/applications/${appId}/documents/${documentId}/reject`;
+                document.getElementById('documentRejectModal').classList.remove('hidden');
+                document.getElementById('documentRejectModal').classList.add('flex');
+            } else {
+                // This is for application rejection
+                document.getElementById('rejectModal').classList.remove('hidden');
+                document.getElementById('rejectModal').classList.add('flex');
+            }
+        }
+
+        function closeDocumentRejectModal() {
+            document.getElementById('documentRejectModal').classList.add('hidden');
+            document.getElementById('documentRejectModal').classList.remove('flex');
+            documentToReject = null;
         }
     </script>
 

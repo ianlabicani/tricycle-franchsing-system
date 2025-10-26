@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Sb;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Models\ApplicationDocument;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApplicationController extends Controller
 {
@@ -56,6 +59,17 @@ class ApplicationController extends Controller
         if ($application->status !== 'for_approval') {
             return redirect()->route('sb.applications.show', $application)
                 ->with('error', 'Application must be in "For Approval" status to be approved.');
+        }
+
+        // Check if driver has another active application
+        $otherActiveApps = Application::where('user_id', $application->user_id)
+            ->where('id', '!=', $application->id)
+            ->whereNotIn('status', ['completed', 'released', 'rejected'])
+            ->exists();
+
+        if ($otherActiveApps) {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Cannot approve: Driver already has another active application in the system.');
         }
 
         $application->update([
@@ -127,6 +141,19 @@ class ApplicationController extends Controller
         // If complete, mark as ready for scheduling
         $status = $request->is_complete ? 'for_scheduling' : 'incomplete';
 
+        // If marking as complete (for_scheduling), check if driver has another active application
+        if ($status === 'for_scheduling') {
+            $otherActiveApps = Application::where('user_id', $application->user_id)
+                ->where('id', '!=', $application->id)
+                ->whereNotIn('status', ['completed', 'released', 'rejected'])
+                ->exists();
+
+            if ($otherActiveApps) {
+                return redirect()->route('sb.applications.show', $application)
+                    ->with('error', 'Cannot mark as complete: Driver already has another active application in the system.');
+            }
+        }
+
         $application->update([
             'status' => $status,
             'remarks' => $request->remarks,
@@ -138,5 +165,97 @@ class ApplicationController extends Controller
 
         return redirect()->route('sb.applications.show', $application)
             ->with('success', $message);
+    }
+
+    /**
+     * Approve a single document submitted by the driver.
+     */
+    public function approveDocument(Application $application, ApplicationDocument $document)
+    {
+        // Verify the document belongs to this application
+        if ($document->application_id !== $application->id) {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Document not found for this application.');
+        }
+
+        $document->update([
+            'status' => 'approved',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return redirect()->route('sb.applications.show', $application)
+            ->with('success', ucfirst($document->document_label) . ' approved successfully.');
+    }
+
+    /**
+     * Reject a single document submitted by the driver.
+     */
+    public function rejectDocument(Request $request, Application $application, ApplicationDocument $document)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:500',
+        ]);
+
+        // Verify the document belongs to this application
+        if ($document->application_id !== $application->id) {
+            return redirect()->route('sb.applications.show', $application)
+                ->with('error', 'Document not found for this application.');
+        }
+
+        $document->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->reason,
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return redirect()->route('sb.applications.show', $application)
+            ->with('success', ucfirst($document->document_label) . ' rejected. Driver will be notified.');
+    }
+
+    /**
+     * View a document submitted by the driver (for images).
+     */
+    public function viewDocument(Application $application, ApplicationDocument $document)
+    {
+        // Verify the document belongs to this application
+        if ($document->application_id !== $application->id) {
+            abort(404);
+        }
+
+        // Check if file exists
+        if (! Storage::disk('private')->exists($document->file_path)) {
+            abort(404, 'Document file not found.');
+        }
+
+        // For images, display in browser
+        if ($document->isImage()) {
+            return response()->file(Storage::disk('private')->path($document->file_path));
+        }
+
+        // For non-images, download
+        return $this->downloadDocument($application, $document);
+    }
+
+    /**
+     * Download a document submitted by the driver.
+     */
+    public function downloadDocument(Application $application, ApplicationDocument $document)
+    {
+        // Verify the document belongs to this application
+        if ($document->application_id !== $application->id) {
+            abort(404);
+        }
+
+        // Check if file exists
+        if (! Storage::disk('private')->exists($document->file_path)) {
+            abort(404, 'Document file not found.');
+        }
+
+        return Storage::disk('private')->download(
+            $document->file_path,
+            $document->file_name
+        );
     }
 }
