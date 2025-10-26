@@ -24,10 +24,6 @@
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ route('driver.requirements') }}" class="text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('driver.requirements') ? 'bg-blue-500' : '' }}">
-                    <i class="fas fa-file-upload"></i>
-                    <span>Requirements</span>
-                </a>
                 <a href="{{ route('driver.inspection') }}" class="text-white hover:bg-blue-500 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('driver.inspection') ? 'bg-blue-500' : '' }}">
                     <i class="fas fa-calendar-check"></i>
                     <span>Inspection</span>
@@ -132,10 +128,6 @@
             <a href="{{ route('driver.dashboard') }}" class="block text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('driver.dashboard') ? 'bg-blue-600' : '' }}">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
-            </a>
-            <a href="{{ route('driver.requirements') }}" class="block text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('driver.requirements') ? 'bg-blue-600' : '' }}">
-                <i class="fas fa-file-upload"></i>
-                <span>Requirements</span>
             </a>
             <a href="{{ route('driver.inspection') }}" class="block text-white hover:bg-blue-600 px-4 py-2 rounded-lg transition font-medium flex items-center space-x-2 {{ request()->routeIs('driver.inspection') ? 'bg-blue-600' : '' }}">
                 <i class="fas fa-calendar-check"></i>

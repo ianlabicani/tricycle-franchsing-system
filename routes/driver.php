@@ -10,11 +10,6 @@ Route::middleware(['auth', 'verified'])->prefix('driver')->name('driver.')->grou
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Requirements Management
-    Route::get('/requirements', function () {
-        return view('driver.requirements');
-    })->name('requirements');
-
     // Inspection Management
     Route::get('/inspection', function () {
         return view('driver.inspection');
